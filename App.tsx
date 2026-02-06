@@ -2,14 +2,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, NavLink, useParams, useNavigate } from 'react-router-dom';
 import { WordProvider, useWords } from './hooks/useWords';
+import { ToastProvider } from './hooks/useToast';
+import { ModalProvider } from './hooks/useModal';
 import { Home } from './components/Home';
 import { FlashcardMode } from './components/FlashcardMode';
 import { QuizMode } from './components/QuizMode';
 import { MatchingMode } from './components/MatchingMode';
 import { SpellingMode } from './components/SpellingMode';
 import { WordListManager } from './components/WordListManager';
+import { ToastContainer } from './components/Toast';
+import { ModalContainer } from './components/Modal';
 import { GameMode } from './types';
-import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon } from './components/icons/Icons';
+import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon, InformationCircleIcon } from './components/icons/Icons';
+
+const AboutPage: React.FC = () => (
+    <div className="flex flex-col items-center justify-center text-center animate-fade-in-fast pt-16">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 text-[#56A652]">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+        </svg>
+        <h1 className="text-4xl font-bold text-[#1A2B22] dark:text-white mt-4 mb-4">About MemoryDeck</h1>
+        <p className="text-lg text-[#AFBD96]">This page is currently under construction.</p>
+        <p className="mt-2 text-lg text-[#AFBD96]">More information about the application will be available here soon!</p>
+         <NavLink to="/" className="mt-8 bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">
+            Go back to Dashboard
+        </NavLink>
+    </div>
+);
 
 const App: React.FC = () => {
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -34,20 +52,27 @@ const App: React.FC = () => {
     }, [theme]);
 
     return (
-        <WordProvider>
-            <HashRouter>
-                <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
-                    <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
-                    <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/manage-words" element={<WordListManager />} />
-                            <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
-                        </Routes>
-                    </main>
-                </div>
-            </HashRouter>
-        </WordProvider>
+        <ToastProvider>
+            <ModalProvider>
+                <WordProvider>
+                    <HashRouter>
+                        <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
+                            <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
+                            <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+                                <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/manage-words" element={<WordListManager />} />
+                                    <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
+                                    <Route path="/about" element={<AboutPage />} />
+                                </Routes>
+                            </main>
+                            <ToastContainer />
+                            <ModalContainer />
+                        </div>
+                    </HashRouter>
+                </WordProvider>
+            </ModalProvider>
+        </ToastProvider>
     );
 };
 
@@ -107,6 +132,12 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void, language: strin
                                     <span>{language === 'english' ? 'Tiếng Việt' : 'English'}</span>
                                     <GlobeAltIcon />
                                 </button>
+                                <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
+                                <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Application</div>
+                                <NavLink to="/about" onClick={() => setIsSettingsOpen(false)} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                    <span>About</span>
+                                    <InformationCircleIcon />
+                                </NavLink>
                                 <VersionDisplay />
                             </div>
                         )}

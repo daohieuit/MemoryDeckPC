@@ -85,7 +85,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         return (
             <div className="text-center">
                 <h2 className="text-3xl font-bold text-[#0EAD69] mb-4">Congratulations!</h2>
-                <p className="text-[#1A2B22]/80 dark:text-white/80 mb-6">You've matched all the terms in <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
+                <p className="text-[#121e18]/80 dark:text-white/80 mb-6">You've matched all the terms in <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
                 <button onClick={handleRestart} className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">Play Again</button>
             </div>
         )
@@ -94,7 +94,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="text-center mb-6">
-                <div className="text-4xl font-mono font-bold text-[#1A2B22] dark:text-white tracking-wider">
+                <div className="text-4xl font-mono font-bold text-[#121e18] dark:text-white tracking-wider">
                     {formatTime(elapsedTime)}
                 </div>
             </div>
@@ -118,7 +118,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                                 onClick={() => setSelectedTerm(term)}
                                 className={`w-full p-4 rounded-lg text-left transition-all duration-200 ${bgClass}`}
                             >
-                                <span className={isMatched ? 'line-through text-[#AFBD96]' : 'text-[#1A2B22] dark:text-white'}>{term.term}</span>
+                                <span className={isMatched ? 'line-through text-[#AFBD96]' : 'text-[#121e18] dark:text-white'}>{term.term}</span>
                             </button>
                         );
                     })}
@@ -142,7 +142,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                                 onClick={() => setSelectedDefinition(term)}
                                 className={`w-full p-4 rounded-lg text-left transition-all duration-200 ${bgClass}`}
                             >
-                                <span className={isMatched ? 'line-through text-[#AFBD96]' : 'text-[#1A2B22]/80 dark:text-white/80'}>{term.definition}</span>
+                                <span className={isMatched ? 'line-through text-[#AFBD96]' : 'text-[#121e18]/80 dark:text-white/80'}>{term.definition}</span>
                             </button>
                         );
                     })}

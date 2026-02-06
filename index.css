@@ -1,0 +1,50 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Custom Scrollbar Styling
+ * This applies a consistent, themed scrollbar across all WebKit-based browsers
+ * (like Chrome, Safari, and Electron), enhancing the visual appeal of the app.
+ */
+
+/* Sets the overall size of the scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* The "track" is the background of the scrollbar. Making it transparent gives an "auto-hide" effect. */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* The "thumb" is the draggable part of the scrollbar. */
+::-webkit-scrollbar-thumb {
+  /* Light mode thumb color, matches UI elements. */
+  background-color: #CDC6AE; 
+  border-radius: 20px;
+  /* Creates a "padding" effect around the thumb, making it look thinner. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /* Slightly darker on hover for better feedback. */
+  background-color: #AFBD96;
+}
+
+/**
+ * Dark Mode Scrollbar Styles
+ * These styles are applied when the .dark class is present on the <html> element.
+ */
+.dark ::-webkit-scrollbar-thumb {
+  /* Dark mode thumb color, matches UI elements. */
+  background-color: #467645;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  /* Slightly lighter on hover for better feedback. */
+  background-color: #588157;
+}

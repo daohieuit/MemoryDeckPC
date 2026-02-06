@@ -1,4 +1,7 @@
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useToast } from './useToast';
+import { useModal } from './useModal';
 import { Deck, Term, Progress, ProgressStatus } from '../types';
 
 declare global {
@@ -11,6 +14,8 @@ declare global {
                 deleteDeck: (id: number) => Promise<void>;
                 getTerms: () => Promise<Term[]>;
                 addTerm: (deckId: number, term: string, definition: string, ipa: string, functionValue: string) => Promise<number>;
+                updateTerm: (termId: number, termData: Partial<Omit<Term, 'id' | 'deck_id'>>) => Promise<void>;
+                deleteTerm: (termId: number) => Promise<void>;
                 getAllProgress: () => Promise<Progress[]>;
                 updateProgress: (termId: number, status: ProgressStatus, lastReviewed: string) => Promise<void>;
             };
@@ -29,9 +34,11 @@ interface WordsContextType {
     decks: Deck[];
     terms: Term[];
     progress: Progress[];
-    addDeck: (name: string) => void;
+    addDeck: (name: string) => Promise<number> | number;
     deleteDeck: (id: number) => void;
     addTermsToDeck: (deckId: number, newTerms: NewTerm[]) => void;
+    updateTerm: (termId: number, termData: Partial<Omit<Term, 'id' | 'deck_id'>>) => void;
+    deleteTerm: (termId: number) => void;
     getTermsForDeck: (deckId: number) => Term[];
     getProgressForTerm: (termId: number) => Progress;
     updateProgress: (termId: number, newProgress: Partial<Progress>) => void;
@@ -40,6 +47,8 @@ interface WordsContextType {
 const WordsContext = createContext<WordsContextType | undefined>(undefined);
 
 export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { showToast } = useToast();
+    const { showConfirm } = useModal();
     const [decks, setDecks] = useState<Deck[]>([]);
     const [terms, setTerms] = useState<Term[]>([]);
     const [progress, setProgress] = useState<Progress[]>([]);
@@ -86,6 +95,7 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (window.electronAPI) {
             const id = await window.electronAPI.db.addDeck(name);
             setDecks(prev => [...prev, { id, name }]);
+            return id;
         } else {
             const newDeckId = decks.length > 0 ? Math.max(...decks.map(c => c.id)) + 1 : 1;
             const newDeck: Deck = { id: newDeckId, name };
@@ -94,33 +104,42 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 persistWeb('decks', updated);
                 return updated;
             });
+            return newDeckId;
         }
     }, [decks]);
 
-    const deleteDeck = useCallback(async (id: number) => {
-        if (window.electronAPI) {
-            await window.electronAPI.db.deleteDeck(id);
-            setTerms(prev => prev.filter(t => t.deck_id !== id));
-            setDecks(prev => prev.filter(d => d.id !== id));
-        } else {
-            const termsToDelete = terms.filter(t => t.deck_id === id).map(t => t.id);
-            setTerms(prev => {
-                const updated = prev.filter(t => t.deck_id !== id);
-                persistWeb('terms', updated);
-                return updated;
-            });
-            setProgress(prev => {
-                const updated = prev.filter(p => !termsToDelete.includes(p.term_id));
-                persistWeb('progress', updated);
-                return updated;
-            });
-            setDecks(prev => {
-                const updated = prev.filter(d => d.id !== id);
-                persistWeb('decks', updated);
-                return updated;
-            });
-        }
-    }, [terms]);
+    const deleteDeck = useCallback((id: number) => {
+        showConfirm({
+            title: 'Delete Deck',
+            message: 'Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.',
+            confirmText: 'Delete',
+            confirmVariant: 'danger',
+            onConfirm: async () => {
+                if (window.electronAPI) {
+                    await window.electronAPI.db.deleteDeck(id);
+                    setTerms(prev => prev.filter(t => t.deck_id !== id));
+                    setDecks(prev => prev.filter(d => d.id !== id));
+                } else {
+                    const termsToDelete = terms.filter(t => t.deck_id === id).map(t => t.id);
+                    setTerms(prev => {
+                        const updated = prev.filter(t => t.deck_id !== id);
+                        persistWeb('terms', updated);
+                        return updated;
+                    });
+                    setProgress(prev => {
+                        const updated = prev.filter(p => !termsToDelete.includes(p.term_id));
+                        persistWeb('progress', updated);
+                        return updated;
+                    });
+                    setDecks(prev => {
+                        const updated = prev.filter(d => d.id !== id);
+                        persistWeb('decks', updated);
+                        return updated;
+                    });
+                }
+            }
+        });
+    }, [terms, showConfirm]);
 
     const addTermsToDeck = useCallback(async (deckId: number, newTerms: NewTerm[]) => {
         if (window.electronAPI) {
@@ -161,6 +180,56 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
         }
     }, []);
+
+    const updateTerm = useCallback(async (termId: number, termData: Partial<Omit<Term, 'id' | 'deck_id'>>) => {
+        if (window.electronAPI) {
+            await window.electronAPI.db.updateTerm(termId, termData);
+        }
+
+        setTerms(prev => {
+            const updated = prev.map(t =>
+                t.id === termId ? { ...t, ...termData } : t
+            );
+            persistWeb('terms', updated);
+            return updated;
+        });
+    }, []);
+
+    const deleteTerm = useCallback((termId: number) => {
+        const termToDelete = terms.find(t => t.id === termId);
+        if (!termToDelete) return;
+
+        const progressToDelete = progress.find(p => p.term_id === termId);
+
+        // Optimistically update state
+        setTerms(prev => prev.filter(t => t.id !== termId));
+        setProgress(prev => prev.filter(p => p.term_id !== termId));
+
+        const handleUndo = () => {
+            setTerms(prev => [...prev, termToDelete].sort((a, b) => a.id - b.id));
+            if (progressToDelete) {
+                setProgress(prev => [...prev, progressToDelete].sort((a, b) => a.term_id - b.term_id));
+            }
+        };
+
+        const handlePermanentDelete = () => {
+            if (window.electronAPI) {
+                window.electronAPI.db.deleteTerm(termId);
+            } else {
+                const newTerms = terms.filter(t => t.id !== termId);
+                const newProgress = progress.filter(p => p.term_id !== termId);
+                persistWeb('terms', newTerms);
+                persistWeb('progress', newProgress);
+            }
+        };
+
+        showToast({
+            message: `Deleted "${termToDelete.term}"`,
+            duration: 5000,
+            onUndo: handleUndo,
+            onTimeout: handlePermanentDelete,
+        });
+    }, [terms, progress, showToast]);
 
     const getTermsForDeck = useCallback((deckId: number) => {
         return terms.filter(term => term.deck_id === deckId);
@@ -212,6 +281,8 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addDeck,
         deleteDeck,
         addTermsToDeck,
+        updateTerm,
+        deleteTerm,
         getTermsForDeck,
         getProgressForTerm,
         updateProgress,

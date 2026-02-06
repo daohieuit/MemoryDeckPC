@@ -22,6 +22,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             }
 
             // Prioritize older reviewed terms
+            // FIX: Access `last_reviewed` from the progress object `progressB`, not directly from term `b`.
             return new Date(progressA.last_reviewed).getTime() - new Date(progressB.last_reviewed).getTime();
         });
     }, [terms, getProgressForTerm]);
@@ -30,8 +31,10 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         if (terms.length > 0) {
             setSessionTerms(sortTermsForReview());
             setCurrentIndex(0);
+            setIsFlipped(false);
         }
-    }, [terms, sortTermsForReview]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [terms]); // Only reset session when the deck's terms change, not on every progress update.
 
     const handleNext = (difficulty: 'easy' | 'good' | 'hard') => {
         const term = sessionTerms[currentIndex];
@@ -71,17 +74,21 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     }
 
     const currentTerm = sessionTerms[currentIndex];
-    if (!currentTerm) return null;
 
-    const progress = (currentIndex / terms.length) * 100;
+    // Don't render anything until sessionTerms is populated to avoid division by zero or flicker
+    if (sessionTerms.length === 0 || !currentTerm) {
+        return null;
+    }
+
+    const progress = ((currentIndex + 1) / sessionTerms.length) * 100;
 
     return (
         <div className="flex flex-col items-center">
             <div className="w-full max-w-2xl mb-4">
                 <div className="bg-[#e8e5da] dark:bg-[#446843] rounded-full h-2.5">
-                    <div className="bg-[#56A652] h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                    <div className="bg-[#56A652] h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                 </div>
-                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex} / {terms.length}</p>
+                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex + 1} / {sessionTerms.length}</p>
             </div>
 
             <div style={{ perspective: '1000px' }} className="w-full max-w-2xl h-80 mb-6">
@@ -90,15 +97,19 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     onClick={() => setIsFlipped(!isFlipped)}
                 >
                     {/* Front of card */}
-                    <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg">
-                        <h2 className="text-5xl font-bold text-[#1A2B22] dark:text-white mb-4">{currentTerm.term}</h2>
-                        <p className="text-2xl text-[#AFBD96]">/{currentTerm.ipa}/</p>
+                    <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg text-center">
+                        <h2 className="text-5xl font-bold text-[#121e18] dark:text-white mb-3">{currentTerm.term}</h2>
+                        {currentTerm.function && (
+                            <p className="text-xl italic text-[#AFBD96] mb-3">{currentTerm.function}</p>
+                        )}
+                        {currentTerm.ipa && (
+                            <p className="text-2xl text-[#AFBD96] font-mono">{currentTerm.ipa}</p>
+                        )}
                         <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                     {/* Back of card */}
                     <div className="absolute w-full h-full backface-hidden bg-[#F1F5F9] dark:bg-[#446843] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg rotate-y-180">
-                        <p className="text-2xl text-[#1A2B22] dark:text-white text-center mb-4">{currentTerm.definition}</p>
-                        <p className="text-lg text-[#1A2B22]/80 dark:text-white/80 italic text-center">"{currentTerm.function}"</p>
+                        <p className="text-3xl text-[#121e18] dark:text-white text-center">{currentTerm.definition}</p>
                         <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                 </div>
