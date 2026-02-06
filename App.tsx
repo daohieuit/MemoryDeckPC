@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, NavLink, useParams, useNavigate } from 'react-router-dom';
 import { WordProvider, useWords } from './hooks/useWords';
 import { ToastProvider } from './hooks/useToast';
+import { ModalProvider } from './hooks/useModal';
 import { Home } from './components/Home';
 import { FlashcardMode } from './components/FlashcardMode';
 import { QuizMode } from './components/QuizMode';
@@ -10,6 +11,7 @@ import { MatchingMode } from './components/MatchingMode';
 import { SpellingMode } from './components/SpellingMode';
 import { WordListManager } from './components/WordListManager';
 import { ToastContainer } from './components/Toast';
+import { ModalContainer } from './components/Modal';
 import { GameMode } from './types';
 import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon } from './components/icons/Icons';
 
@@ -37,21 +39,24 @@ const App: React.FC = () => {
 
     return (
         <ToastProvider>
-            <WordProvider>
-                <HashRouter>
-                    <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
-                        <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
-                        <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/manage-words" element={<WordListManager />} />
-                                <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
-                            </Routes>
-                        </main>
-                        <ToastContainer />
-                    </div>
-                </HashRouter>
-            </WordProvider>
+            <ModalProvider>
+                <WordProvider>
+                    <HashRouter>
+                        <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#121e18] text-[#121e18] dark:text-[#F1F5F9] font-sans">
+                            <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
+                            <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+                                <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/manage-words" element={<WordListManager />} />
+                                    <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
+                                </Routes>
+                            </main>
+                            <ToastContainer />
+                            <ModalContainer />
+                        </div>
+                    </HashRouter>
+                </WordProvider>
+            </ModalProvider>
         </ToastProvider>
     );
 };
@@ -80,7 +85,7 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void, language: strin
                     <NavLink
                         to="/"
                         className={({ isActive }) =>
-                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-[#56A652] text-white' : 'text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white'}`
+                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-[#56A652] text-white' : 'text-[#121e18]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#121e18] dark:hover:text-white'}`
                         }
                     >
                         <Squares2X2Icon />
@@ -89,26 +94,26 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void, language: strin
                     <NavLink
                         to="/manage-words"
                         className={({ isActive }) =>
-                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-[#56A652] text-white' : 'text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white'}`
+                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-[#56A652] text-white' : 'text-[#121e18]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#121e18] dark:hover:text-white'}`
                         }
                     >
                         <BookOpenIcon />
                         <span>My Decks</span>
                     </NavLink>
                     <div className="relative" ref={settingsRef}>
-                        <button onClick={() => setIsSettingsOpen(prev => !prev)} className="p-2 rounded-full text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">
+                        <button onClick={() => setIsSettingsOpen(prev => !prev)} className="p-2 rounded-full text-[#121e18]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">
                             <GearIcon />
                         </button>
                         {isSettingsOpen && (
                             <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#344E41] rounded-md shadow-lg py-1 border border-[#EDE9DE] dark:border-[#3A5A40] animate-fade-in-fast">
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Appearance</div>
-                                <button onClick={toggleTheme} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                <button onClick={toggleTheme} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#121e18] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                                     {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
                                 </button>
                                 <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Language</div>
-                                <button onClick={toggleLanguage} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                <button onClick={toggleLanguage} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#121e18] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{language === 'english' ? 'Tiếng Việt' : 'English'}</span>
                                     <GlobeAltIcon />
                                 </button>
@@ -175,8 +180,8 @@ const LearnScreen: React.FC = () => {
                     <button onClick={() => navigate('/')} className="text-[#56A652] hover:brightness-90 mb-2 flex items-center">
                         <i className="fas fa-arrow-left mr-2"></i> Back to Dashboard
                     </button>
-                    <h1 className="text-3xl md:text-4xl font-bold text-[#1A2B22] dark:text-white capitalize">{mode.replace('-', ' ')} Mode</h1>
-                    <p className="text-[#AFBD96]">Deck: <span className="font-semibold text-[#1A2B22]/90 dark:text-[#F1F5F9]/90">{deck.name}</span></p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-[#121e18] dark:text-white capitalize">{mode.replace('-', ' ')} Mode</h1>
+                    <p className="text-[#AFBD96]">Deck: <span className="font-semibold text-[#121e18]/90 dark:text-[#F1F5F9]/90">{deck.name}</span></p>
                 </div>
                 <div className="flex space-x-2">
                     <ModeNavButton currentMode={mode} targetMode={GameMode.Flashcard} deckId={deckId} icon={<BookOpenIcon />} />
@@ -200,9 +205,9 @@ interface ModeNavButtonProps {
 const ModeNavButton: React.FC<ModeNavButtonProps> = ({ currentMode, targetMode, deckId, icon }) => {
     const navigate = useNavigate();
     const isActive = currentMode === targetMode;
-    const baseClasses = "p-3 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#F1F5F9] dark:focus:ring-offset-[#1A2B22] focus:ring-[#56A652]";
+    const baseClasses = "p-3 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#F1F5F9] dark:focus:ring-offset-[#121e18] focus:ring-[#56A652]";
     const activeClasses = "bg-[#56A652] text-white shadow-lg";
-    const inactiveClasses = "bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white";
+    const inactiveClasses = "bg-[#e8e5da] dark:bg-[#446843] text-[#121e18]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#121e18] dark:hover:text-white";
 
     return (
         <button

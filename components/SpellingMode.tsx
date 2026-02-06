@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
+import { useModal } from '../hooks/useModal';
 import { Term } from '../types';
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -10,6 +11,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
+    const { showAlert } = useModal();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [sessionTerms, setSessionTerms] = useState<Term[]>([]);
@@ -23,7 +25,10 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             utterance.lang = 'en-US';
             window.speechSynthesis.speak(utterance);
         } else {
-            alert('Your browser does not support text-to-speech.');
+            showAlert({
+                title: 'Speech Synthesis Not Supported',
+                message: 'Your browser does not support the text-to-speech feature required for this mode.'
+            });
         }
     };
 
@@ -61,10 +66,14 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     setInputValue('');
                     setFeedback(null);
                 } else {
-                    alert('You have completed all spelling terms!');
+                    showAlert({
+                        title: 'Congratulations!',
+                        message: 'You have completed all spelling terms!'
+                    });
                     setCurrentIndex(0);
                     setSessionTerms(shuffleArray(terms));
                     setFeedback(null);
+                    setInputValue('');
                 }
             }, 1500);
         } else {
@@ -87,7 +96,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     return (
         <div className="max-w-2xl mx-auto text-center">
             <p className="text-[#AFBD96] mb-2">Term {currentIndex + 1} of {sessionTerms.length}</p>
-            <p className="text-xl text-[#1A2B22]/80 dark:text-white/80 mb-4">{currentTerm.definition}</p>
+            <p className="text-xl text-[#121e18]/80 dark:text-white/80 mb-4">{currentTerm.definition}</p>
             <button onClick={handleSpeak} className="bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] p-4 rounded-full mb-8 text-2xl transition-colors">
                 <i className="fas fa-volume-up"></i>
             </button>
@@ -96,7 +105,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className={`w-full bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white text-2xl text-center py-4 px-6 rounded-lg border-2 ${inputBorderColor} outline-none transition-all duration-300`}
+                    className={`w-full bg-white dark:bg-[#344E41] text-[#121e18] dark:text-white text-2xl text-center py-4 px-6 rounded-lg border-2 ${inputBorderColor} outline-none transition-all duration-300`}
                     placeholder="Type the term here"
                     autoFocus
                 />

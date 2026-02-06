@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
+import { useModal } from '../hooks/useModal';
 import { Term } from '../types';
 
 // Utility to shuffle an array
@@ -16,6 +17,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
+    const { showAlert } = useModal();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -68,7 +70,10 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             setCurrentQuestionIndex(i => i + 1);
         } else {
             // End of quiz
-            alert(`Quiz finished! Your score: ${score}/${shuffledTerms.length}`);
+            showAlert({
+                title: 'Quiz Finished!',
+                message: `Your score: ${score}/${shuffledTerms.length}`
+            });
             setCurrentQuestionIndex(0);
             setScore(0);
         }
@@ -85,7 +90,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         <div className="max-w-3xl mx-auto text-center">
             <p className="text-[#AFBD96] mb-2">Question {currentQuestionIndex + 1} of {shuffledTerms.length}</p>
             <h2 className="text-4xl font-bold mb-4">{currentTerm.term}</h2>
-            <p className="text-xl text-[#1A2B22]/80 dark:text-white/80 mb-8">Which of the following best defines this term?</p>
+            <p className="text-xl text-[#121e18]/80 dark:text-white/80 mb-8">Which of the following best defines this term?</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {options.map(option => {
@@ -117,7 +122,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     <p className={`text-2xl font-bold mb-4 ${isCorrect ? 'text-[#0EAD69]' : 'text-[#EE4266]'}`}>
                         {isCorrect ? 'Correct!' : 'Incorrect!'}
                     </p>
-                    {!isCorrect && <p className="mb-4 text-[#1A2B22]/80 dark:text-white/80">The correct answer was: {currentTerm.definition}</p>}
+                    {!isCorrect && <p className="mb-4 text-[#121e18]/80 dark:text-white/80">The correct answer was: {currentTerm.definition}</p>}
                     <button
                         onClick={handleNext}
                         className="bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors"

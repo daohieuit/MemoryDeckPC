@@ -14,7 +14,7 @@ function initDatabase() {
     ? path.dirname(app.getPath('exe'))
     : app.getAppPath();
 
-  const oldDbPath = path.join(dbDir, 'memorydeck.db');
+  const oldDbPath = path.join(dbDir, 'memorydock.db');
   const newDbPath = path.join(dbDir, 'memorydeck.db');
 
   // Check if we need to migrate the DB file
@@ -72,13 +72,18 @@ function initDatabase() {
 
   // Migrate progress table
   if (tables.includes('progress')) {
-    try {
-      db.exec('ALTER TABLE progress RENAME COLUMN word_id TO term_id');
-    } catch (e) { }
-    try {
-      db.exec('ALTER TABLE progress DROP COLUMN difficulty_level');
-    } catch (e) {
-      console.log('Could not drop difficulty_level, might be an older SQLite version.');
+    const progressColumns = db.prepare("PRAGMA table_info(progress)").all().map(c => c.name);
+    if (progressColumns.includes('word_id')) {
+      try {
+        db.exec('ALTER TABLE progress RENAME COLUMN word_id TO term_id');
+      } catch (e) { }
+    }
+    if (progressColumns.includes('difficulty_level')) {
+      try {
+        db.exec('ALTER TABLE progress DROP COLUMN difficulty_level');
+      } catch (e) {
+        console.log('Could not drop difficulty_level:', e.message);
+      }
     }
   }
 

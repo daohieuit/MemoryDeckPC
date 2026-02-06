@@ -13,7 +13,7 @@ interface ToastProps {
 
 const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, onUndo, onTimeout }) => {
     const [isExiting, setIsExiting] = useState(false);
-    
+
     const handleDismiss = () => {
         setIsExiting(true);
         setTimeout(() => onDismiss(id), 300);
@@ -30,7 +30,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
         return () => {
             clearTimeout(timer);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [duration, id, onDismiss, onTimeout]);
 
     const handleUndoClick = () => {
@@ -39,7 +39,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
         }
         handleDismiss();
     };
-    
+
     const handleCloseClick = () => {
         if (onTimeout) { // Closing manually should also trigger the permanent action
             onTimeout();
@@ -52,15 +52,15 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
             <div className="p-4">
                 <div className="flex items-start">
                     <div className="flex-1">
-                        <p className="text-sm font-medium text-[#1A2B22] dark:text-white">{message}</p>
+                        <p className="text-sm font-medium text-[#121e18] dark:text-white">{message}</p>
                     </div>
                     <div className="ml-4 flex-shrink-0 flex items-center">
                         {onUndo && (
-                             <button onClick={handleUndoClick} className="mr-4 text-sm font-semibold text-[#56A652] hover:underline focus:outline-none">
+                            <button onClick={handleUndoClick} className="mr-4 text-sm font-semibold text-[#56A652] hover:underline focus:outline-none">
                                 Undo
-                             </button>
+                            </button>
                         )}
-                        <button onClick={handleCloseClick} className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white focus:outline-none">
+                        <button onClick={handleCloseClick} className="text-[#AFBD96] hover:text-[#121e18] dark:hover:text-white focus:outline-none">
                             <i className="fas fa-times"></i>
                         </button>
                     </div>

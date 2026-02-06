@@ -33,7 +33,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             setCurrentIndex(0);
             setIsFlipped(false);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [terms]); // Only reset session when the deck's terms change, not on every progress update.
 
     const handleNext = (difficulty: 'easy' | 'good' | 'hard') => {
@@ -98,7 +98,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                 >
                     {/* Front of card */}
                     <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg text-center">
-                        <h2 className="text-5xl font-bold text-[#1A2B22] dark:text-white mb-3">{currentTerm.term}</h2>
+                        <h2 className="text-5xl font-bold text-[#121e18] dark:text-white mb-3">{currentTerm.term}</h2>
                         {currentTerm.function && (
                             <p className="text-xl italic text-[#AFBD96] mb-3">{currentTerm.function}</p>
                         )}
@@ -109,7 +109,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     </div>
                     {/* Back of card */}
                     <div className="absolute w-full h-full backface-hidden bg-[#F1F5F9] dark:bg-[#446843] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg rotate-y-180">
-                        <p className="text-3xl text-[#1A2B22] dark:text-white text-center">{currentTerm.definition}</p>
+                        <p className="text-3xl text-[#121e18] dark:text-white text-center">{currentTerm.definition}</p>
                         <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                 </div>
