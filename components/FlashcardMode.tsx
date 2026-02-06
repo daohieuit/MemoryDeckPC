@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
 import { Term, ProgressStatus } from '../types';
@@ -22,6 +21,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             }
 
             // Prioritize older reviewed terms
+            // FIX: Access `last_reviewed` from the progress object `progressB`, not directly from term `b`.
             return new Date(progressA.last_reviewed).getTime() - new Date(progressB.last_reviewed).getTime();
         });
     }, [terms, getProgressForTerm]);
@@ -30,8 +30,10 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         if (terms.length > 0) {
             setSessionTerms(sortTermsForReview());
             setCurrentIndex(0);
+            setIsFlipped(false);
         }
-    }, [terms, sortTermsForReview]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [terms]); // Only reset session when the deck's terms change, not on every progress update.
 
     const handleNext = (difficulty: 'easy' | 'good' | 'hard') => {
         const term = sessionTerms[currentIndex];
@@ -71,17 +73,21 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     }
 
     const currentTerm = sessionTerms[currentIndex];
-    if (!currentTerm) return null;
 
-    const progress = (currentIndex / terms.length) * 100;
+    // Don't render anything until sessionTerms is populated to avoid division by zero or flicker
+    if (sessionTerms.length === 0 || !currentTerm) {
+        return null;
+    }
+
+    const progress = ((currentIndex + 1) / sessionTerms.length) * 100;
 
     return (
         <div className="flex flex-col items-center">
             <div className="w-full max-w-2xl mb-4">
                 <div className="bg-[#e8e5da] dark:bg-[#446843] rounded-full h-2.5">
-                    <div className="bg-[#56A652] h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                    <div className="bg-[#56A652] h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                 </div>
-                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex} / {terms.length}</p>
+                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex + 1} / {sessionTerms.length}</p>
             </div>
 
             <div style={{ perspective: '1000px' }} className="w-full max-w-2xl h-80 mb-6">
