@@ -75,7 +75,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (terms.length < 4) {
-        return <p className="text-center text-slate-500 dark:text-slate-400">You need at least 4 terms in this deck to start a quiz.</p>;
+        return <p className="text-center text-[#AFBD96]">You need at least 4 terms in this deck to start a quiz.</p>;
     }
 
     const currentTerm = shuffledTerms[currentQuestionIndex];
@@ -83,20 +83,20 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
     return (
         <div className="max-w-3xl mx-auto text-center">
-            <p className="text-slate-500 dark:text-slate-400 mb-2">Question {currentQuestionIndex + 1} of {shuffledTerms.length}</p>
+            <p className="text-[#AFBD96] mb-2">Question {currentQuestionIndex + 1} of {shuffledTerms.length}</p>
             <h2 className="text-4xl font-bold mb-4">{currentTerm.term}</h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">Which of the following best defines this term?</p>
+            <p className="text-xl text-[#1A2B22]/80 dark:text-white/80 mb-8">Which of the following best defines this term?</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {options.map(option => {
                     const isSelected = selectedAnswer === option.id;
                     const isCorrectAnswer = option.id === currentTerm.id;
 
-                    let buttonClass = 'bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600';
+                    let buttonClass = 'bg-white dark:bg-[#446843] hover:bg-[#DAD7CD] dark:hover:bg-[#467645]';
                     if (isSelected) {
-                        buttonClass = isCorrect ? 'bg-green-600 text-white' : 'bg-red-600 text-white';
+                        buttonClass = isCorrect ? 'bg-[#0EAD69] text-white' : 'bg-[#EE4266] text-white';
                     } else if (selectedAnswer !== null && isCorrectAnswer) {
-                        buttonClass = 'bg-green-600 text-white';
+                        buttonClass = 'bg-[#0EAD69] text-white';
                     }
 
                     return (
@@ -114,13 +114,13 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
             {selectedAnswer !== null && (
                 <div className="flex flex-col items-center">
-                    <p className={`text-2xl font-bold mb-4 ${isCorrect ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                    <p className={`text-2xl font-bold mb-4 ${isCorrect ? 'text-[#0EAD69]' : 'text-[#EE4266]'}`}>
                         {isCorrect ? 'Correct!' : 'Incorrect!'}
                     </p>
-                    {!isCorrect && <p className="mb-4 text-slate-600 dark:text-slate-300">The correct answer was: {currentTerm.definition}</p>}
+                    {!isCorrect && <p className="mb-4 text-[#1A2B22]/80 dark:text-white/80">The correct answer was: {currentTerm.definition}</p>}
                     <button
                         onClick={handleNext}
-                        className="bg-sky-500 text-white font-bold py-3 px-10 rounded-lg hover:bg-sky-600 transition-colors"
+                        className="bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors"
                     >
                         {currentQuestionIndex < shuffledTerms.length - 1 ? 'Next Question' : 'Finish Quiz'}
                     </button>

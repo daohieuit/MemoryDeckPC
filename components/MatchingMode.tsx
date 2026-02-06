@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
 import { Term } from '../types';
@@ -69,7 +70,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     }
 
     if (terms.length < 2) {
-        return <p className="text-center text-slate-500 dark:text-slate-400">You need at least 2 terms in this deck to play the matching game.</p>;
+        return <p className="text-center text-[#AFBD96]">You need at least 2 terms in this deck to play the matching game.</p>;
     }
 
     const elapsedTime = startTime && currentTime ? currentTime - startTime : 0;
@@ -83,9 +84,9 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     if (isComplete) {
         return (
             <div className="text-center">
-                <h2 className="text-3xl font-bold text-green-600 dark:text-green-400 mb-4">Congratulations!</h2>
-                <p className="text-slate-600 dark:text-slate-300 mb-6">You've matched all the terms in <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
-                <button onClick={handleRestart} className="bg-sky-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-600 transition-colors">Play Again</button>
+                <h2 className="text-3xl font-bold text-[#0EAD69] mb-4">Congratulations!</h2>
+                <p className="text-[#1A2B22]/80 dark:text-white/80 mb-6">You've matched all the terms in <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
+                <button onClick={handleRestart} className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">Play Again</button>
             </div>
         )
     }
@@ -93,7 +94,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="text-center mb-6">
-                <div className="text-4xl font-mono font-bold text-slate-700 dark:text-slate-300 tracking-wider">
+                <div className="text-4xl font-mono font-bold text-[#1A2B22] dark:text-white tracking-wider">
                     {formatTime(elapsedTime)}
                 </div>
             </div>
@@ -105,10 +106,10 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         const isSelected = selectedTerm?.id === term.id;
                         const isIncorrect = incorrectMatch?.[0] === term.id;
 
-                        let bgClass = 'bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600';
-                        if (isMatched) bgClass = 'bg-green-100 dark:bg-green-800/50 cursor-default';
-                        if (isSelected) bgClass = 'bg-sky-500 text-white';
-                        if (isIncorrect) bgClass = 'bg-red-500 text-white animate-shake';
+                        let bgClass = 'bg-white dark:bg-[#446843] hover:bg-[#DAD7CD] dark:hover:bg-[#467645]';
+                        if (isMatched) bgClass = 'bg-[#0EAD69]/20 dark:bg-[#0EAD69]/30 cursor-default';
+                        if (isSelected) bgClass = 'bg-[#56A652] text-white';
+                        if (isIncorrect) bgClass = 'bg-[#EE4266] text-white animate-shake';
 
                         return (
                             <button
@@ -117,7 +118,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                                 onClick={() => setSelectedTerm(term)}
                                 className={`w-full p-4 rounded-lg text-left transition-all duration-200 ${bgClass}`}
                             >
-                                <span className={isMatched ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}>{term.term}</span>
+                                <span className={isMatched ? 'line-through text-[#AFBD96]' : 'text-[#1A2B22] dark:text-white'}>{term.term}</span>
                             </button>
                         );
                     })}
@@ -129,10 +130,10 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         const isSelected = selectedDefinition?.id === term.id;
                         const isIncorrect = incorrectMatch?.[1] === term.id;
 
-                        let bgClass = 'bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600';
-                        if (isMatched) bgClass = 'bg-green-100 dark:bg-green-800/50 cursor-default';
-                        if (isSelected) bgClass = 'bg-sky-500 text-white';
-                        if (isIncorrect) bgClass = 'bg-red-500 text-white animate-shake';
+                        let bgClass = 'bg-white dark:bg-[#446843] hover:bg-[#DAD7CD] dark:hover:bg-[#467645]';
+                        if (isMatched) bgClass = 'bg-[#0EAD69]/20 dark:bg-[#0EAD69]/30 cursor-default';
+                        if (isSelected) bgClass = 'bg-[#56A652] text-white';
+                        if (isIncorrect) bgClass = 'bg-[#EE4266] text-white animate-shake';
 
                         return (
                             <button
@@ -141,7 +142,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                                 onClick={() => setSelectedDefinition(term)}
                                 className={`w-full p-4 rounded-lg text-left transition-all duration-200 ${bgClass}`}
                             >
-                                <span className={isMatched ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300'}>{term.definition}</span>
+                                <span className={isMatched ? 'line-through text-[#AFBD96]' : 'text-[#1A2B22]/80 dark:text-white/80'}>{term.definition}</span>
                             </button>
                         );
                     })}

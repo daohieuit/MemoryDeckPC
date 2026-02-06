@@ -67,7 +67,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (terms.length === 0) {
-        return <p className="text-center text-slate-500 dark:text-slate-400">No terms available in this deck.</p>;
+        return <p className="text-center text-[#AFBD96]">No terms available in this deck.</p>;
     }
 
     const currentTerm = sessionTerms[currentIndex];
@@ -78,10 +78,10 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     return (
         <div className="flex flex-col items-center">
             <div className="w-full max-w-2xl mb-4">
-                <div className="bg-gray-200 dark:bg-slate-700 rounded-full h-2.5">
-                    <div className="bg-sky-500 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                <div className="bg-[#DAD7CD] dark:bg-[#446843] rounded-full h-2.5">
+                    <div className="bg-[#56A652] h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
                 </div>
-                <p className="text-center mt-2 text-slate-500 dark:text-slate-400">{currentIndex} / {terms.length}</p>
+                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex} / {terms.length}</p>
             </div>
 
             <div style={{ perspective: '1000px' }} className="w-full max-w-2xl h-80 mb-6">
@@ -90,24 +90,24 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     onClick={() => setIsFlipped(!isFlipped)}
                 >
                     {/* Front of card */}
-                    <div className="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg">
-                        <h2 className="text-5xl font-bold text-slate-900 dark:text-white mb-4">{currentTerm.term}</h2>
-                        <p className="text-2xl text-slate-500 dark:text-slate-400">/{currentTerm.ipa}/</p>
-                        <div className="absolute bottom-4 text-xs text-gray-400 dark:text-slate-500">Click to flip</div>
+                    <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg">
+                        <h2 className="text-5xl font-bold text-[#1A2B22] dark:text-white mb-4">{currentTerm.term}</h2>
+                        <p className="text-2xl text-[#AFBD96]">/{currentTerm.ipa}/</p>
+                        <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                     {/* Back of card */}
-                    <div className="absolute w-full h-full backface-hidden bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg rotate-y-180">
-                        <p className="text-2xl text-slate-900 dark:text-white text-center mb-4">{currentTerm.definition}</p>
-                        <p className="text-lg text-slate-600 dark:text-slate-300 italic text-center">"{currentTerm.function}"</p>
-                        <div className="absolute bottom-4 text-xs text-gray-400 dark:text-slate-500">Click to flip</div>
+                    <div className="absolute w-full h-full backface-hidden bg-[#F1F5F9] dark:bg-[#446843] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg rotate-y-180">
+                        <p className="text-2xl text-[#1A2B22] dark:text-white text-center mb-4">{currentTerm.definition}</p>
+                        <p className="text-lg text-[#1A2B22]/80 dark:text-white/80 italic text-center">"{currentTerm.function}"</p>
+                        <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                 </div>
             </div>
 
             <div className="flex space-x-4">
-                <button onClick={() => handleNext('hard')} className="bg-red-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-600 transition-transform transform hover:scale-105">Hard</button>
-                <button onClick={() => handleNext('good')} className="bg-yellow-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-yellow-600 transition-transform transform hover:scale-105">Good</button>
-                <button onClick={() => handleNext('easy')} className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-600 transition-transform transform hover:scale-105">Easy</button>
+                <button onClick={() => handleNext('hard')} className="bg-[#EE4266] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">Hard</button>
+                <button onClick={() => handleNext('good')} className="bg-[#FFD23F] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">Good</button>
+                <button onClick={() => handleNext('easy')} className="bg-[#0EAD69] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">Easy</button>
             </div>
         </div>
     );
