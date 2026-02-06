@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
 import { Term, ProgressStatus } from '../types';
@@ -96,15 +97,19 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     onClick={() => setIsFlipped(!isFlipped)}
                 >
                     {/* Front of card */}
-                    <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg">
-                        <h2 className="text-5xl font-bold text-[#1A2B22] dark:text-white mb-4">{currentTerm.term}</h2>
-                        <p className="text-2xl text-[#AFBD96]">/{currentTerm.ipa}/</p>
+                    <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg text-center">
+                        <h2 className="text-5xl font-bold text-[#1A2B22] dark:text-white mb-3">{currentTerm.term}</h2>
+                        {currentTerm.function && (
+                            <p className="text-xl italic text-[#AFBD96] mb-3">{currentTerm.function}</p>
+                        )}
+                        {currentTerm.ipa && (
+                            <p className="text-2xl text-[#AFBD96] font-mono">{currentTerm.ipa}</p>
+                        )}
                         <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                     {/* Back of card */}
                     <div className="absolute w-full h-full backface-hidden bg-[#F1F5F9] dark:bg-[#446843] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg rotate-y-180">
-                        <p className="text-2xl text-[#1A2B22] dark:text-white text-center mb-4">{currentTerm.definition}</p>
-                        <p className="text-lg text-[#1A2B22]/80 dark:text-white/80 italic text-center">"{currentTerm.function}"</p>
+                        <p className="text-3xl text-[#1A2B22] dark:text-white text-center">{currentTerm.definition}</p>
                         <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
                     </div>
                 </div>

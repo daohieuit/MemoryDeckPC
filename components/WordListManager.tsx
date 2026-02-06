@@ -15,6 +15,15 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
         return content ? `/${content}/` : '';
     };
 
+    const formatFunction = (func: string): string => {
+        const content = func.trim();
+        if (!content) return '';
+        if (content.startsWith('(') && content.endsWith(')')) {
+            return content;
+        }
+        return `(${content})`;
+    };
+
     const handleNewTermChange = (index: number, field: 'term' | 'definition' | 'function' | 'ipa', value: string) => {
         const updated = [...newTerms];
         updated[index] = { ...updated[index], [field]: value };
@@ -35,7 +44,11 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
         e.preventDefault();
         const termsToAdd = newTerms
             .filter(t => t.term.trim() && t.definition.trim())
-            .map(t => ({ ...t, ipa: formatIPA(t.ipa) }));
+            .map(t => ({
+                ...t,
+                ipa: formatIPA(t.ipa),
+                function: formatFunction(t.function)
+            }));
 
         if (termsToAdd.length > 0) {
             addTermsToDeck(deckId, termsToAdd);
@@ -50,7 +63,7 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
             if (parts.length === 2) {
                 return { term: parts[0], definition: parts[1], function: '', ipa: '' };
             } else if (parts.length === 4) {
-                return { term: parts[0], function: parts[1], ipa: formatIPA(parts[2]), definition: parts[3] };
+                return { term: parts[0], function: formatFunction(parts[1]), ipa: formatIPA(parts[2]), definition: parts[3] };
             }
             return null;
         }).filter((term): term is { term: string; definition: string; function: string; ipa: string; } => term !== null);
@@ -113,6 +126,12 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
                                     placeholder="Function (e.g., n, adj, adv, v)"
                                     value={nt.function}
                                     onChange={(e) => handleNewTermChange(index, 'function', e.target.value)}
+                                    onBlur={(e) => {
+                                        const formatted = formatFunction(e.target.value);
+                                        if (formatted !== nt.function) {
+                                            handleNewTermChange(index, 'function', formatted);
+                                        }
+                                    }}
                                     className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                 />
                                 <input
