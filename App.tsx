@@ -2,12 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, NavLink, useParams, useNavigate } from 'react-router-dom';
 import { WordProvider, useWords } from './hooks/useWords';
+import { ToastProvider } from './hooks/useToast';
 import { Home } from './components/Home';
 import { FlashcardMode } from './components/FlashcardMode';
 import { QuizMode } from './components/QuizMode';
 import { MatchingMode } from './components/MatchingMode';
 import { SpellingMode } from './components/SpellingMode';
 import { WordListManager } from './components/WordListManager';
+import { ToastContainer } from './components/Toast';
 import { GameMode } from './types';
 import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon } from './components/icons/Icons';
 
@@ -34,20 +36,23 @@ const App: React.FC = () => {
     }, [theme]);
 
     return (
-        <WordProvider>
-            <HashRouter>
-                <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
-                    <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
-                    <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/manage-words" element={<WordListManager />} />
-                            <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
-                        </Routes>
-                    </main>
-                </div>
-            </HashRouter>
-        </WordProvider>
+        <ToastProvider>
+            <WordProvider>
+                <HashRouter>
+                    <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
+                        <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
+                        <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/manage-words" element={<WordListManager />} />
+                                <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
+                            </Routes>
+                        </main>
+                        <ToastContainer />
+                    </div>
+                </HashRouter>
+            </WordProvider>
+        </ToastProvider>
     );
 };
 
