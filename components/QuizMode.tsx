@@ -92,7 +92,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     const isSelected = selectedAnswer === option.id;
                     const isCorrectAnswer = option.id === currentTerm.id;
 
-                    let buttonClass = 'bg-white dark:bg-[#446843] hover:bg-[#DAD7CD] dark:hover:bg-[#467645]';
+                    let buttonClass = 'bg-white dark:bg-[#446843] hover:bg-[#e8e5da] dark:hover:bg-[#467645]';
                     if (isSelected) {
                         buttonClass = isCorrect ? 'bg-[#0EAD69] text-white' : 'bg-[#EE4266] text-white';
                     } else if (selectedAnswer !== null && isCorrectAnswer) {

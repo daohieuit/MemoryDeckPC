@@ -78,7 +78,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     return (
         <div className="flex flex-col items-center">
             <div className="w-full max-w-2xl mb-4">
-                <div className="bg-[#DAD7CD] dark:bg-[#446843] rounded-full h-2.5">
+                <div className="bg-[#e8e5da] dark:bg-[#446843] rounded-full h-2.5">
                     <div className="bg-[#56A652] h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
                 </div>
                 <p className="text-center mt-2 text-[#AFBD96]">{currentIndex} / {terms.length}</p>

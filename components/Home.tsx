@@ -60,7 +60,7 @@ interface ModeButtonProps {
 const ModeButton: React.FC<ModeButtonProps> = ({ onClick, icon, label }) => (
     <button
         onClick={onClick}
-        className="w-full flex items-center justify-center space-x-2 bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22] dark:text-[#F1F5F9] py-3 px-4 rounded-lg hover:bg-[#56A652] hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#56A652] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#344E41]"
+        className="w-full flex items-center justify-center space-x-2 bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-[#F1F5F9] py-3 px-4 rounded-lg hover:bg-[#56A652] hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#56A652] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#344E41]"
     >
         {icon}
         <span className="font-semibold">{label}</span>

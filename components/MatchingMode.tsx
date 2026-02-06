@@ -106,7 +106,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         const isSelected = selectedTerm?.id === term.id;
                         const isIncorrect = incorrectMatch?.[0] === term.id;
 
-                        let bgClass = 'bg-white dark:bg-[#446843] hover:bg-[#DAD7CD] dark:hover:bg-[#467645]';
+                        let bgClass = 'bg-white dark:bg-[#446843] hover:bg-[#e8e5da] dark:hover:bg-[#467645]';
                         if (isMatched) bgClass = 'bg-[#0EAD69]/20 dark:bg-[#0EAD69]/30 cursor-default';
                         if (isSelected) bgClass = 'bg-[#56A652] text-white';
                         if (isIncorrect) bgClass = 'bg-[#EE4266] text-white animate-shake';
@@ -130,7 +130,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         const isSelected = selectedDefinition?.id === term.id;
                         const isIncorrect = incorrectMatch?.[1] === term.id;
 
-                        let bgClass = 'bg-white dark:bg-[#446843] hover:bg-[#DAD7CD] dark:hover:bg-[#467645]';
+                        let bgClass = 'bg-white dark:bg-[#446843] hover:bg-[#e8e5da] dark:hover:bg-[#467645]';
                         if (isMatched) bgClass = 'bg-[#0EAD69]/20 dark:bg-[#0EAD69]/30 cursor-default';
                         if (isSelected) bgClass = 'bg-[#56A652] text-white';
                         if (isIncorrect) bgClass = 'bg-[#EE4266] text-white animate-shake';

@@ -97,13 +97,13 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void, language: strin
                         {isSettingsOpen && (
                             <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#344E41] rounded-md shadow-lg py-1 border border-[#EDE9DE] dark:border-[#3A5A40] animate-fade-in-fast">
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Appearance</div>
-                                <button onClick={toggleTheme} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#DAD7CD] dark:hover:bg-[#446843]">
+                                <button onClick={toggleTheme} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                                     {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
                                 </button>
                                 <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Language</div>
-                                <button onClick={toggleLanguage} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#DAD7CD] dark:hover:bg-[#446843]">
+                                <button onClick={toggleLanguage} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{language === 'english' ? 'Tiếng Việt' : 'English'}</span>
                                     <GlobeAltIcon />
                                 </button>
@@ -197,7 +197,7 @@ const ModeNavButton: React.FC<ModeNavButtonProps> = ({ currentMode, targetMode, 
     const isActive = currentMode === targetMode;
     const baseClasses = "p-3 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#F1F5F9] dark:focus:ring-offset-[#1A2B22] focus:ring-[#56A652]";
     const activeClasses = "bg-[#56A652] text-white shadow-lg";
-    const inactiveClasses = "bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white";
+    const inactiveClasses = "bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white";
 
     return (
         <button

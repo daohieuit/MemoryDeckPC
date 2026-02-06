@@ -88,7 +88,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         <div className="max-w-2xl mx-auto text-center">
             <p className="text-[#AFBD96] mb-2">Term {currentIndex + 1} of {sessionTerms.length}</p>
             <p className="text-xl text-[#1A2B22]/80 dark:text-white/80 mb-4">{currentTerm.definition}</p>
-            <button onClick={handleSpeak} className="bg-[#DAD7CD] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] p-4 rounded-full mb-8 text-2xl transition-colors">
+            <button onClick={handleSpeak} className="bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] p-4 rounded-full mb-8 text-2xl transition-colors">
                 <i className="fas fa-volume-up"></i>
             </button>
             <form onSubmit={handleSubmit}>

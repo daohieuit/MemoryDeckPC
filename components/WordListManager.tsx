@@ -73,7 +73,7 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
             ) : (
                 <ul className="space-y-2 mb-6 max-h-60 overflow-y-auto pr-2">
                     {deckTerms.map((term, index) => (
-                        <li key={term.id} className="flex items-center gap-3 bg-[#DAD7CD] dark:bg-[#446843]/50 p-2.5 rounded-md">
+                        <li key={term.id} className="flex items-center gap-3 bg-[#e8e5da] dark:bg-[#446843]/50 p-2.5 rounded-md">
                             <span className="w-6 shrink-0 text-right font-mono text-sm text-[#AFBD96]">{index + 1}.</span>
                             <span className="font-semibold text-[#1A2B22] dark:text-white text-sm truncate">{term.term}</span>
                             <span className="ml-auto pl-4 text-[#AFBD96] text-sm text-right truncate max-w-xs">{term.definition}</span>
@@ -99,21 +99,21 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
                                     placeholder="Term *"
                                     value={nt.term}
                                     onChange={(e) => handleNewTermChange(index, 'term', e.target.value)}
-                                    className="bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
+                                    className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                 />
                                 <input
                                     type="text"
                                     placeholder="Definition *"
                                     value={nt.definition}
                                     onChange={(e) => handleNewTermChange(index, 'definition', e.target.value)}
-                                    className="bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
+                                    className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                 />
                                 <input
                                     type="text"
                                     placeholder="Function (e.g., n, adj, adv, v)"
                                     value={nt.function}
                                     onChange={(e) => handleNewTermChange(index, 'function', e.target.value)}
-                                    className="bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
+                                    className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                 />
                                 <input
                                     type="text"
@@ -126,10 +126,10 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
                                             handleNewTermChange(index, 'ipa', formatted);
                                         }
                                     }}
-                                    className="bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
+                                    className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                 />
                             </div>
-                            <button type="button" onClick={() => removeRow(index)} disabled={newTerms.length <= 1} className="text-[#EE4266] hover:brightness-90 disabled:text-[#AFBD96] disabled:cursor-not-allowed p-2 rounded-full bg-[#DAD7CD] dark:bg-[#446843]/50 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">
+                            <button type="button" onClick={() => removeRow(index)} disabled={newTerms.length <= 1} className="text-[#EE4266] hover:brightness-90 disabled:text-[#AFBD96] disabled:cursor-not-allowed p-2 rounded-full bg-[#e8e5da] dark:bg-[#446843]/50 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">
                                 <i className="fas fa-minus-circle"></i>
                             </button>
                         </div>
@@ -150,7 +150,7 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
                     <div className="bg-white dark:bg-[#344E41] rounded-lg shadow-xl p-6 w-full max-w-2xl border border-[#EDE9DE] dark:border-[#3A5A40]">
                         <h2 className="text-2xl font-bold mb-4">Bulk Import Cards</h2>
                         <p className="text-[#AFBD96] mb-2">Paste your card data below. Each new line represents a separate card.</p>
-                        <div className="text-sm bg-[#DAD7CD] dark:bg-[#446843]/50 p-3 rounded-md mb-4 border border-[#EDE9DE] dark:border-[#3A5A40]/50">
+                        <div className="text-sm bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md mb-4 border border-[#EDE9DE] dark:border-[#3A5A40]/50">
                             <p className="font-semibold text-[#1A2B22] dark:text-white">Supported Formats (use Tab to separate fields):</p>
                             <code className="block mt-2 text-[#1A2B22]/80 dark:text-white/80">[Term] (Tab) [Definition]</code>
                             <code className="block mt-1 text-[#1A2B22]/80 dark:text-white/80">[Term] (Tab) [Function] (Tab) [IPA] (Tab) [Definition]</code>
@@ -163,7 +163,7 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
                             placeholder={"Term 1\tDefinition 1\nTerm 2\tn\t/ipa/\tDefinition 2"}
                         />
                         <div className="flex justify-end gap-4 mt-4">
-                            <button type="button" onClick={() => setIsImportModalOpen(false)} className="px-4 py-2 rounded-md text-[#1A2B22] dark:text-white bg-[#DAD7CD] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">Cancel</button>
+                            <button type="button" onClick={() => setIsImportModalOpen(false)} className="px-4 py-2 rounded-md text-[#1A2B22] dark:text-white bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">Cancel</button>
                             <button type="button" onClick={handleImport} className="px-4 py-2 rounded-md text-white bg-[#56A652] hover:brightness-90 transition-colors font-semibold">Import Cards</button>
                         </div>
                     </div>
@@ -203,7 +203,7 @@ export const WordListManager: React.FC = () => {
                         value={newDeckName}
                         onChange={(e) => setNewDeckName(e.target.value)}
                         placeholder="e.g., TOEIC Vocabulary"
-                        className="flex-grow bg-[#DAD7CD] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
+                        className="flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                     />
                     <button
                         type="submit"
