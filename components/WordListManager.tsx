@@ -86,10 +86,16 @@ const DeckEditor: React.FC<{ deckId: number }> = ({ deckId }) => {
             ) : (
                 <ul className="space-y-2 mb-6 max-h-60 overflow-y-auto pr-2">
                     {deckTerms.map((term, index) => (
-                        <li key={term.id} className="flex items-center gap-3 bg-[#e8e5da] dark:bg-[#446843]/50 p-2.5 rounded-md">
-                            <span className="w-6 shrink-0 text-right font-mono text-sm text-[#AFBD96]">{index + 1}.</span>
-                            <span className="font-semibold text-[#1A2B22] dark:text-white text-sm truncate">{term.term}</span>
-                            <span className="ml-auto pl-4 text-[#AFBD96] text-sm text-right truncate max-w-xs">{term.definition}</span>
+                        <li key={term.id} className="flex items-start gap-3 bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md">
+                            <span className="w-6 shrink-0 text-right font-mono text-sm text-[#AFBD96] pt-1">{index + 1}.</span>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline gap-x-3 flex-wrap">
+                                    <span className="font-bold text-base text-[#1A2B22] dark:text-white">{term.term}</span>
+                                    {term.function && <span className="text-sm italic text-[#AFBD96]">{term.function}</span>}
+                                    {term.ipa && <span className="font-mono text-sm text-[#AFBD96]">{term.ipa}</span>}
+                                </div>
+                                <p className="text-sm text-[#1A2B22]/80 dark:text-white/80 mt-1 break-words">{term.definition}</p>
+                            </div>
                         </li>
                     ))}
                 </ul>
