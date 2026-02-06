@@ -58,7 +58,8 @@ export const generateVocabularyList = async (category: string, count: number = 2
       throw new Error("Empty response from API");
     }
 
-    const parsed = JSON.parse(jsonText);
+    // FIX: Trim whitespace from JSON response before parsing.
+    const parsed = JSON.parse(jsonText.trim());
     return parsed as GeneratedWord[];
 
   } catch (error) {

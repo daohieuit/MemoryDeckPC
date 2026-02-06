@@ -36,7 +36,7 @@ const App: React.FC = () => {
     return (
         <WordProvider>
             <HashRouter>
-                <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans">
+                <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
                     <Header theme={theme} toggleTheme={toggleTheme} language={language} toggleLanguage={toggleLanguage} />
                     <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
                         <Routes>
@@ -66,16 +66,16 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void, language: strin
     }, []);
 
     return (
-        <header className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-gray-200 dark:border-slate-700/50">
+        <header className="bg-white/80 dark:bg-[#3A5A40]/50 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-[#EDE9DE] dark:border-[#3A5A40]/50">
             <nav className="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
-                <NavLink to="/" className="text-2xl font-bold text-sky-500 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300 transition-colors duration-300">
+                <NavLink to="/" className="text-2xl font-bold text-[#56A652] hover:brightness-90 transition-colors duration-300">
                     <i className="fas fa-feather-alt mr-2"></i>MemoryDeck
                 </NavLink>
                 <div className="flex items-center space-x-2 md:space-x-4">
                     <NavLink
                         to="/"
                         className={({ isActive }) =>
-                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-sky-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'}`
+                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-[#56A652] text-white' : 'text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white'}`
                         }
                     >
                         <Squares2X2Icon />
@@ -84,26 +84,26 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void, language: strin
                     <NavLink
                         to="/manage-words"
                         className={({ isActive }) =>
-                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-sky-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'}`
+                            `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-[#56A652] text-white' : 'text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white'}`
                         }
                     >
                         <BookOpenIcon />
                         <span>My Decks</span>
                     </NavLink>
                     <div className="relative" ref={settingsRef}>
-                        <button onClick={() => setIsSettingsOpen(prev => !prev)} className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+                        <button onClick={() => setIsSettingsOpen(prev => !prev)} className="p-2 rounded-full text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">
                             <GearIcon />
                         </button>
                         {isSettingsOpen && (
-                            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 border border-gray-200 dark:border-slate-700 animate-fade-in-fast">
-                                <div className="px-3 py-2 text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase">Appearance</div>
-                                <button onClick={toggleTheme} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700">
+                            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#344E41] rounded-md shadow-lg py-1 border border-[#EDE9DE] dark:border-[#3A5A40] animate-fade-in-fast">
+                                <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Appearance</div>
+                                <button onClick={toggleTheme} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                                     {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
                                 </button>
-                                <div className="border-t border-gray-200 dark:border-slate-700 my-1"></div>
-                                <div className="px-3 py-2 text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase">Language</div>
-                                <button onClick={toggleLanguage} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
+                                <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">Language</div>
+                                <button onClick={toggleLanguage} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{language === 'english' ? 'Tiếng Việt' : 'English'}</span>
                                     <GlobeAltIcon />
                                 </button>
@@ -131,7 +131,7 @@ const VersionDisplay: React.FC = () => {
     }, []);
 
     return (
-        <div className="border-t border-gray-200 dark:border-slate-700 mt-1 px-3 py-2 text-[10px] text-gray-400 dark:text-slate-500 text-center">
+        <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] mt-1 px-3 py-2 text-[10px] text-[#AFBD96] text-center">
             Version {version}
         </div>
     );
@@ -167,11 +167,11 @@ const LearnScreen: React.FC = () => {
         <div className="flex flex-col">
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <button onClick={() => navigate('/')} className="text-sky-500 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300 mb-2 flex items-center">
+                    <button onClick={() => navigate('/')} className="text-[#56A652] hover:brightness-90 mb-2 flex items-center">
                         <i className="fas fa-arrow-left mr-2"></i> Back to Dashboard
                     </button>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white capitalize">{mode.replace('-', ' ')} Mode</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Deck: <span className="font-semibold text-slate-600 dark:text-slate-300">{deck.name}</span></p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-[#1A2B22] dark:text-white capitalize">{mode.replace('-', ' ')} Mode</h1>
+                    <p className="text-[#AFBD96]">Deck: <span className="font-semibold text-[#1A2B22]/90 dark:text-[#F1F5F9]/90">{deck.name}</span></p>
                 </div>
                 <div className="flex space-x-2">
                     <ModeNavButton currentMode={mode} targetMode={GameMode.Flashcard} deckId={deckId} icon={<BookOpenIcon />} />
@@ -195,9 +195,9 @@ interface ModeNavButtonProps {
 const ModeNavButton: React.FC<ModeNavButtonProps> = ({ currentMode, targetMode, deckId, icon }) => {
     const navigate = useNavigate();
     const isActive = currentMode === targetMode;
-    const baseClasses = "p-3 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 dark:focus:ring-offset-slate-900 focus:ring-sky-500";
-    const activeClasses = "bg-sky-500 text-white shadow-lg";
-    const inactiveClasses = "bg-gray-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white";
+    const baseClasses = "p-3 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#F1F5F9] dark:focus:ring-offset-[#1A2B22] focus:ring-[#56A652]";
+    const activeClasses = "bg-[#56A652] text-white shadow-lg";
+    const inactiveClasses = "bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22]/80 dark:text-[#F1F5F9]/80 hover:bg-[#CDC6AE] dark:hover:bg-[#467645] hover:text-[#1A2B22] dark:hover:text-white";
 
     return (
         <button

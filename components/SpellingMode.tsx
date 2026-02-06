@@ -74,21 +74,21 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (terms.length === 0) {
-        return <p className="text-center text-slate-500 dark:text-slate-400">No terms available in this deck.</p>;
+        return <p className="text-center text-[#AFBD96]">No terms available in this deck.</p>;
     }
 
     const currentTerm = sessionTerms[currentIndex];
     if (!currentTerm) return null;
 
-    let inputBorderColor = 'border-gray-300 dark:border-slate-600 focus:border-sky-500';
-    if (feedback === 'correct') inputBorderColor = 'border-green-500';
-    if (feedback === 'incorrect') inputBorderColor = 'border-red-500 animate-shake';
+    let inputBorderColor = 'border-[#EDE9DE] dark:border-[#3A5A40] focus:border-[#56A652]';
+    if (feedback === 'correct') inputBorderColor = 'border-[#0EAD69]';
+    if (feedback === 'incorrect') inputBorderColor = 'border-[#EE4266] animate-shake';
 
     return (
         <div className="max-w-2xl mx-auto text-center">
-            <p className="text-slate-500 dark:text-slate-400 mb-2">Term {currentIndex + 1} of {sessionTerms.length}</p>
-            <p className="text-xl text-slate-600 dark:text-slate-300 mb-4">{currentTerm.definition}</p>
-            <button onClick={handleSpeak} className="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 p-4 rounded-full mb-8 text-2xl transition-colors">
+            <p className="text-[#AFBD96] mb-2">Term {currentIndex + 1} of {sessionTerms.length}</p>
+            <p className="text-xl text-[#1A2B22]/80 dark:text-white/80 mb-4">{currentTerm.definition}</p>
+            <button onClick={handleSpeak} className="bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] p-4 rounded-full mb-8 text-2xl transition-colors">
                 <i className="fas fa-volume-up"></i>
             </button>
             <form onSubmit={handleSubmit}>
@@ -96,11 +96,11 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className={`w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-2xl text-center py-4 px-6 rounded-lg border-2 ${inputBorderColor} outline-none transition-all duration-300`}
+                    className={`w-full bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white text-2xl text-center py-4 px-6 rounded-lg border-2 ${inputBorderColor} outline-none transition-all duration-300`}
                     placeholder="Type the term here"
                     autoFocus
                 />
-                <button type="submit" className="mt-6 bg-sky-500 text-white font-bold py-3 px-10 rounded-lg hover:bg-sky-600 transition-colors">
+                <button type="submit" className="mt-6 bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors">
                     Check
                 </button>
             </form>
