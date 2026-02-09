@@ -13,6 +13,8 @@ function registerIpcHandlers() {
 
     ipcMain.handle('db:getTerms', () => dbOps.getTerms());
     ipcMain.handle('db:addTerm', (_, deckId, term, definition, ipa, functionValue) => dbOps.addTerm(deckId, term, definition, ipa, functionValue));
+    ipcMain.handle('db:updateTerm', (_, termId, termData) => dbOps.updateTerm(termId, termData));
+    ipcMain.handle('db:deleteTerm', (_, termId) => dbOps.deleteTerm(termId));
 
     ipcMain.handle('db:getAllProgress', () => dbOps.getAllProgress());
     ipcMain.handle('db:updateProgress', (_, termId, status, lastReviewed) =>

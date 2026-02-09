@@ -125,6 +125,12 @@ const dbOps = {
   getTerms: () => db.prepare('SELECT * FROM terms').all(),
   addTerm: (deckId, term, definition, ipa, functionValue) =>
     db.prepare('INSERT INTO terms (deck_id, term, definition, ipa, function) VALUES (?, ?, ?, ?, ?)').run(deckId, term, definition, ipa, functionValue).lastInsertRowid,
+  updateTerm: (termId, termData) => {
+    const { term, definition, ipa, function: functionValue } = termData;
+    return db.prepare('UPDATE terms SET term = COALESCE(?, term), definition = COALESCE(?, definition), ipa = COALESCE(?, ipa), function = COALESCE(?, function) WHERE id = ?')
+      .run(term, definition, ipa, functionValue, termId);
+  },
+  deleteTerm: (termId) => db.prepare('DELETE FROM terms WHERE id = ?').run(termId),
   deleteTermsByDeck: (deckId) => db.prepare('DELETE FROM terms WHERE deck_id = ?').run(deckId),
 
   // Progress

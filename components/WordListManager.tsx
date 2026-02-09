@@ -157,7 +157,7 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                                 {isEditMode && (
                                     <div className="flex items-center gap-3 pl-2">
                                         <button onClick={() => handleEditClick(term)} className="text-[#AFBD96] hover:text-[#56A652] transition-colors"><i className="fas fa-pencil-alt"></i></button>
-                                        <button onClick={() => deleteTerm(term.id)} className="text-[#AFBD96] hover:text-[#EE4266] transition-colors"><i className="fas fa-trash-alt"></i></button>
+                                        <button onClick={() => { console.log('Delete button clicked, term.id:', term.id); deleteTerm(term.id); }} className="text-[#AFBD96] hover:text-[#EE4266] transition-colors"><i className="fas fa-trash-alt"></i></button>
                                     </div>
                                 )}
                             </li>
@@ -294,7 +294,7 @@ export const WordListManager: React.FC = () => {
             setExpandedDeckId(id);
         }
     };
-    
+
     const handleToggleEdit = (e: React.MouseEvent, deckId: number) => {
         e.stopPropagation();
         setEditModeDeckId(prevId => {
@@ -352,14 +352,13 @@ export const WordListManager: React.FC = () => {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={(e) => handleToggleEdit(e, deck.id)}
-                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${
-                                            editModeDeckId === deck.id
+                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${editModeDeckId === deck.id
                                                 ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
                                                 : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
-                                        }`}
+                                            }`}
                                     >
-                                        {editModeDeckId === deck.id 
-                                            ? <><i className="fas fa-times mr-2"></i>Cancel</> 
+                                        {editModeDeckId === deck.id
+                                            ? <><i className="fas fa-times mr-2"></i>Cancel</>
                                             : <><i className="fas fa-edit mr-2"></i>Edit</>
                                         }
                                     </button>

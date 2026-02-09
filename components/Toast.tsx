@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useToast } from '../hooks/useToast';
 
 interface ToastProps {
@@ -13,27 +13,54 @@ interface ToastProps {
 
 const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, onUndo, onTimeout }) => {
     const [isExiting, setIsExiting] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const [remaining, setRemaining] = useState(duration);
+    const undoPressedRef = React.useRef(false);
+    const startTimeRef = React.useRef(Date.now());
+    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-    const handleDismiss = () => {
+    const handleDismiss = useCallback(() => {
         setIsExiting(true);
         setTimeout(() => onDismiss(id), 300);
-    };
+    }, [id, onDismiss]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (onTimeout) {
+    const startTimer = useCallback(() => {
+        startTimeRef.current = Date.now();
+        timerRef.current = setTimeout(() => {
+            if (onTimeout && !undoPressedRef.current) {
                 onTimeout();
             }
             handleDismiss();
-        }, duration);
+        }, remaining);
+    }, [handleDismiss, onTimeout, remaining]);
 
-        return () => {
-            clearTimeout(timer);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [duration, id, onDismiss, onTimeout]);
+    const clearTimer = useCallback(() => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isPaused && !isExiting) {
+            startTimer();
+        }
+        return clearTimer;
+    }, [isPaused, isExiting, startTimer, clearTimer]);
+
+    const handleMouseEnter = () => {
+        setIsPaused(true);
+        const elapsed = Date.now() - startTimeRef.current;
+        setRemaining(prev => Math.max(0, prev - elapsed));
+        clearTimer();
+    };
+
+    const handleMouseLeave = () => {
+        setIsPaused(false);
+    };
 
     const handleUndoClick = () => {
+        undoPressedRef.current = true;
         if (onUndo) {
             onUndo();
         }
@@ -41,14 +68,33 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
     };
 
     const handleCloseClick = () => {
-        if (onTimeout) { // Closing manually should also trigger the permanent action
+        if (onTimeout && !undoPressedRef.current) {
             onTimeout();
         }
         handleDismiss();
     };
 
+    const [targetWidth, setTargetWidth] = useState('100%');
+
+    useEffect(() => {
+        if (!isPaused && !isExiting) {
+            // Small delay to ensure the paint has happened
+            const timeout = setTimeout(() => {
+                setTargetWidth('0%');
+            }, 50);
+            return () => clearTimeout(timeout);
+        } else {
+            // When paused, we stay at the current calculated width
+            setTargetWidth(`${(remaining / duration) * 100}%`);
+        }
+    }, [isPaused, isExiting, remaining, duration]);
+
     return (
-        <div className={`relative w-full max-w-sm bg-white dark:bg-[#344E41] shadow-2xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-[#EDE9DE] dark:border-[#3A5A40] animate-fade-in-fast ${isExiting ? 'animate-fade-out-fast' : ''}`}>
+        <div
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className={`relative w-full max-w-sm bg-white dark:bg-[#344E41] shadow-2xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-[#EDE9DE] dark:border-[#3A5A40] animate-fade-in-fast ${isExiting ? 'animate-fade-out-fast' : ''}`}
+        >
             <div className="p-4">
                 <div className="flex items-start">
                     <div className="flex-1">
@@ -70,7 +116,10 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-[#56A652]/20 dark:bg-[#AFBD96]/20">
                     <div
                         className="h-full bg-[#56A652] dark:bg-[#AFBD96]"
-                        style={{ animation: `progress-bar ${duration}ms linear forwards` }}
+                        style={{
+                            width: targetWidth,
+                            transition: isPaused ? 'none' : `width ${remaining}ms linear`,
+                        }}
                     />
                 </div>
             )}
