@@ -17,7 +17,8 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
     const [remaining, setRemaining] = useState(duration);
     const undoPressedRef = React.useRef(false);
     const startTimeRef = React.useRef(Date.now());
-    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
+    // FIX: Namespace 'global.NodeJS' has no exported member 'Timeout'. Using ReturnType<typeof setTimeout> for portability.
+    const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleDismiss = useCallback(() => {
         setIsExiting(true);

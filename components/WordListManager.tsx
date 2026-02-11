@@ -17,7 +17,7 @@ const formatFunction = (func: string): string => {
     return `(${content})`;
 };
 
-const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: () => void }> = ({ deckId, isEditMode, exitEditMode }) => {
+const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: () => void, startInAddMode?: boolean }> = ({ deckId, isEditMode, exitEditMode, startInAddMode }) => {
     const { getTermsForDeck, addTermsToDeck, updateTerm, deleteTerm } = useWords();
     const [newTerms, setNewTerms] = useState([{ term: '', definition: '', function: '', ipa: '' }]);
     const deckTerms = getTermsForDeck(deckId);
@@ -27,13 +27,19 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
 
     const [editingTermId, setEditingTermId] = useState<number | null>(null);
     const [editedTerm, setEditedTerm] = useState({ term: '', definition: '', function: '', ipa: '' });
+    const [isAddingNewCards, setIsAddingNewCards] = useState(false);
 
-    // Reset the new card form when entering edit mode.
+    // Show/hide the "Add New" form when edit mode is toggled
     useEffect(() => {
         if (isEditMode) {
             setNewTerms([{ term: '', definition: '', function: '', ipa: '' }]);
+            // If it's a new deck, show the form automatically. Otherwise, hide it.
+            setIsAddingNewCards(!!startInAddMode);
+        } else {
+            // When not in edit mode, always hide the form.
+            setIsAddingNewCards(false);
         }
-    }, [isEditMode]);
+    }, [isEditMode, startInAddMode]);
 
     const handleSaveNewTerms = useCallback((e?: React.FormEvent) => {
         e?.preventDefault();
@@ -114,7 +120,19 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
 
     return (
         <div className="mt-2 p-4 bg-slate-50 dark:bg-[#344E41]/50 border-t border-[#EDE9DE] dark:border-[#3A5A40]">
-            <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90 mb-3">Cards in this Deck</h4>
+            <div className="flex justify-between items-center mb-3">
+                <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Cards in this Deck</h4>
+                {isEditMode && !isAddingNewCards && (
+                    <button
+                        type="button"
+                        onClick={() => setIsAddingNewCards(true)}
+                        className="bg-[#446843] hover:bg-[#467645] text-white font-bold py-1 px-3 rounded-md transition-colors flex items-center gap-2 text-sm"
+                        aria-label="Add new cards"
+                    >
+                        <i className="fas fa-plus"></i> Add New
+                    </button>
+                )}
+            </div>
 
             {deckTerms.length === 0 && !isEditMode && (
                 <p className="text-[#AFBD96] italic text-sm my-4">This deck is empty. Click 'Edit' to add your first card.</p>
@@ -157,7 +175,7 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                                 {isEditMode && (
                                     <div className="flex items-center gap-3 pl-2">
                                         <button onClick={() => handleEditClick(term)} className="text-[#AFBD96] hover:text-[#56A652] transition-colors"><i className="fas fa-pencil-alt"></i></button>
-                                        <button onClick={() => { console.log('Delete button clicked, term.id:', term.id); deleteTerm(term.id); }} className="text-[#AFBD96] hover:text-[#EE4266] transition-colors"><i className="fas fa-trash-alt"></i></button>
+                                        <button onClick={() => deleteTerm(term.id)} className="text-[#AFBD96] hover:text-[#EE4266] transition-colors"><i className="fas fa-trash-alt"></i></button>
                                     </div>
                                 )}
                             </li>
@@ -166,8 +184,8 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                 </ul>
             )}
 
-            {isEditMode && (
-                <form onSubmit={handleSaveNewTerms}>
+            {isEditMode && isAddingNewCards && (
+                <form onSubmit={handleSaveNewTerms} className="animate-fade-in-fast">
                     <div className="flex items-center justify-between mb-3 pt-4 border-t border-[#EDE9DE] dark:border-[#3A5A40]">
                         <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Add New Cards</h4>
                         <button type="button" onClick={() => setIsImportModalOpen(true)} className="text-sm font-semibold text-[#56A652] hover:underline">
@@ -271,6 +289,7 @@ export const WordListManager: React.FC = () => {
     const [newDeckName, setNewDeckName] = useState('');
     const [expandedDeckId, setExpandedDeckId] = useState<number | null>(null);
     const [editModeDeckId, setEditModeDeckId] = useState<number | null>(null);
+    const [newlyCreatedDeckId, setNewlyCreatedDeckId] = useState<number | null>(null);
 
     // FIX: The `addDeck` function returns a promise. We need to `await` its result
     // before using it to set state, which requires this handler to be `async`.
@@ -282,10 +301,12 @@ export const WordListManager: React.FC = () => {
             // Automatically expand and enter edit mode for new decks
             setExpandedDeckId(newId);
             setEditModeDeckId(newId);
+            setNewlyCreatedDeckId(newId);
         }
     };
 
     const toggleDeck = (id: number) => {
+        setNewlyCreatedDeckId(null);
         const isCurrentlyExpanded = expandedDeckId === id;
         if (isCurrentlyExpanded) {
             setExpandedDeckId(null);
@@ -294,9 +315,10 @@ export const WordListManager: React.FC = () => {
             setExpandedDeckId(id);
         }
     };
-
+    
     const handleToggleEdit = (e: React.MouseEvent, deckId: number) => {
         e.stopPropagation();
+        setNewlyCreatedDeckId(null);
         setEditModeDeckId(prevId => {
             const isEditingThisDeck = prevId === deckId;
             if (isEditingThisDeck) {
@@ -352,13 +374,14 @@ export const WordListManager: React.FC = () => {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={(e) => handleToggleEdit(e, deck.id)}
-                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${editModeDeckId === deck.id
+                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${
+                                            editModeDeckId === deck.id
                                                 ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
                                                 : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
-                                            }`}
+                                        }`}
                                     >
-                                        {editModeDeckId === deck.id
-                                            ? <><i className="fas fa-times mr-2"></i>Cancel</>
+                                        {editModeDeckId === deck.id 
+                                            ? <><i className="fas fa-times mr-2"></i>Cancel</> 
                                             : <><i className="fas fa-edit mr-2"></i>Edit</>
                                         }
                                     </button>
@@ -372,7 +395,7 @@ export const WordListManager: React.FC = () => {
                                 <i className={`fas fa-chevron-down text-[#AFBD96] transition-transform duration-300 ${expandedDeckId === deck.id ? 'rotate-180' : ''}`}></i>
                             </div>
                         </div>
-                        {expandedDeckId === deck.id && <DeckEditor deckId={deck.id} isEditMode={editModeDeckId === deck.id} exitEditMode={handleExitEditMode} />}
+                        {expandedDeckId === deck.id && <DeckEditor deckId={deck.id} isEditMode={editModeDeckId === deck.id} exitEditMode={handleExitEditMode} startInAddMode={deck.id === newlyCreatedDeckId} />}
                     </div>
                 ))}
             </div>
