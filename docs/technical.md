@@ -1,53 +1,55 @@
 # Technical Details: Under the Hood
 
-MemoryDeck is built with modern web and desktop technologies, focusing on performance, offline capability, and a premium user experience.
+MemoryDeck is built with modern web and desktop technologies, focusing on performance, offline reliability, and a premium user experience.
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Frontend Core
-- **React 19**: Utilizing the latest features for efficient rendering.
-- **TypeScript**: Ensuring type safety across the entire application.
-- **Tailwind CSS**: A utility-first CSS framework for rapid, responsive design.
-- **React Router (HashRouter)**: Enabling client-side routing that works perfectly in both browser and Electron environments.
+- **React 19**: Implementing modern hook-based state management and efficient UI updates.
+- **TypeScript**: Ensuring strict type safety across the UI and data layer.
+- **Tailwind CSS v4**: Utilizing the latest CSS-only configuration and the `@tailwindcss/vite` plugin for lightning-fast styling and reduced bundle sizes.
+- **React Router (HashRouter)**: Providing stable client-side routing within the Electron `file://` protocol environment.
 
 ### Desktop Integration
-- **Electron**: Wrapping the web application into a native Windows executable.
-- **electron-builder**: Managing the packaging and installation process (`memorydeck_installer.exe`).
-- **electron-packager**: Used as a fallback for generating portable standalone folders.
+- **Electron v34**: Wrapping the React application into a native desktop container.
+- **SQLite (better-sqlite3)**: A high-performance, native database engine for persistent storage.
+- **electron-builder**: Handles the creation of the production-ready NSIS installer (`MemoryDeck_installer.exe`).
 
 ---
 
 ## 💾 Data Architecture
 
-### SQLite Persistence
-MemoryDeck is strictly offline-first. It now leverages a structured **SQLite** database for superior data integrity and performance on desktop.
+### Persistent SQLite Storage
+Unlike traditional web apps that rely on volatile storage, MemoryDeck uses **SQLite** for all production data.
 
-- **SQLite (Desktop)**: All Decks, Cards, and user progress are stored in a native `memorydeck.db` file handled by `better-sqlite3`.
-- **Local Storage (Fallback)**: For browser-based previews, the app seamlessly falls back to the browser's `localStorage`.
+- **Storage Location**: Data is stored in `memorydeck.db` within the application's local directory.
+- **Schema**:
+    - `decks`: Store collection names and metadata.
+    - `terms`: Store words, definitions, IPA, and grammatical functions.
+    - `progress`: Store SRS (Spaced Repetition System) data, including status (New, Learning, Mastered) and last review timestamps.
+- **Web Fallback**: For development and browser previews, the app automatically transitions to `localStorage` when the Electron API is unavailable.
 
 ---
 
 ## 🔊 Native Features
 
-### Web Speech API
-The **Spelling Check** feature leverages the `window.speechSynthesis` API. 
-- **TTS Engine**: It automatically detects and uses the highest-quality voice available on the host operating system (e.g., Microsoft David/Zira on Windows).
-- **Dynamic Feedback**: Provides audio cues for correct/incorrect answers during learning sessions.
+### Voice & Speech
+The **Spelling Check** mode utilizes the native `SpeechSynthesis` API.
+- **Dynamic Selection**: The app queries the OS for available voices, prioritizing natural-sounding English variants.
+- **Real-time Synthesis**: Provides immediate audio feedback for vocab terms, reinforcing auditory learning.
 
 ---
 
-## 📦 Build Process
+## 📦 Build & Development
 
-### Relative Asset Loading
-To ensure compatibility with the `file://` protocol used in Electron, the Vite configuration is set to:
-```typescript
-base: './'
-```
-This forces all imports (JS, CSS, Images) to use relative paths, preventing "404 Not Found" errors in the packaged executable.
+### Vite Configuration
+The project uses a custom Vite setup optimized for Electron:
+- **Relative Paths**: `base: './'` ensures all assets load correctly from the filesystem.
+- **Vite-Tailwind Bridge**: Integrated via `@tailwindcss/vite` to handle the modern Tailwind v4 syntax.
 
-### Packaging Lifecycle
-1. **Compilation**: `npm run build` generates a minified `/dist` folder.
-2. **Main Process**: `electron/main.cjs` initializes the Electron window and loads the local `index.html`.
-3. **Packaging**: `electron-builder` compresses the resources into an NSIS installer.
+### Packaging Pipeline
+1. **Build**: `npm run build` compiles the React source into the `/dist` directory.
+2. **Main Process**: `electron/main.cjs` (CommonJS) bootstraps the Electron app and sets up IPC (Inter-Process Communication) for database access.
+3. **Packaging**: `npm run electron:build` invokes `electron-builder` to bundle the app into a distributive installer.

@@ -119,80 +119,88 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
     };
 
     return (
-        <div className="mt-2 p-4 bg-slate-50 dark:bg-[#344E41]/50 border-t border-[#EDE9DE] dark:border-[#3A5A40]">
-            <div className="flex justify-between items-center mb-3">
-                <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Cards in this Deck</h4>
-                {isEditMode && !isAddingNewCards && (
-                    <button
-                        type="button"
-                        onClick={() => setIsAddingNewCards(true)}
-                        className="bg-[#446843] hover:bg-[#467645] text-white font-bold py-1 px-3 rounded-md transition-colors flex items-center gap-2 text-sm"
-                        aria-label="Add new cards"
-                    >
-                        <i className="fas fa-plus"></i> Add New
-                    </button>
-                )}
-            </div>
+        <div className="px-2 py-3 bg-slate-50 dark:bg-[#344E41]/50">
+            {!startInAddMode && (
+                <>
+                    <div className="flex justify-between items-center mb-3 px-4">
+                        {!startInAddMode && (
+                            <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Cards in this Deck</h4>
+                        )}                {isEditMode && !isAddingNewCards && (
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingNewCards(true)}
+                                className="bg-[#446843] hover:bg-[#467645] text-white font-bold py-1 px-3 rounded-md transition-colors flex items-center gap-2 text-sm"
+                                aria-label="Add new cards"
+                            >
+                                <i className="fas fa-plus"></i> Add New
+                            </button>
+                        )}
+                    </div>
 
-            {deckTerms.length === 0 && !isEditMode && (
-                <p className="text-[#AFBD96] italic text-sm my-4">This deck is empty. Click 'Edit' to add your first card.</p>
+                    {deckTerms.length === 0 && !isEditMode && (
+                        <p className="text-[#AFBD96] italic text-sm my-4 px-4">This deck is empty. Click 'Edit' to add your first card.</p>
+                    )}
+
+                    {deckTerms.length > 0 && (
+                        <ul className="space-y-2 mb-6 max-h-96 overflow-y-auto pr-2 pl-4">
+                            {deckTerms.map((term, index) => (
+                                editingTermId === term.id ? (
+                                    // EDITING VIEW for a single card
+                                    <li key={term.id} className="bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md animate-fade-in-fast">
+                                        <div className="w-full flex items-start gap-2">
+                                            <span className="pt-2 w-8 text-right font-mono text-[#AFBD96] shrink-0">{index + 1}.</span>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                                                <input type="text" placeholder="Term *" value={editedTerm.term} onChange={e => handleEditedTermChange('term', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder="Definition *" value={editedTerm.definition} onChange={e => handleEditedTermChange('definition', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder="Function" value={editedTerm.function} onChange={e => handleEditedTermChange('function', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder="IPA" value={editedTerm.ipa} onChange={e => handleEditedTermChange('ipa', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                            </div>
+                                            <div className="flex flex-col gap-2 pt-1">
+                                                <button onClick={() => handleSaveEdit(term.id)} className="text-[#56A652] hover:brightness-125 transition-transform transform hover:scale-110"><i className="fas fa-save"></i></button>
+                                                <button onClick={handleCancelEdit} className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"><i className="fas fa-times"></i></button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                ) : (
+                                    // DISPLAY VIEW for a single card
+                                    <li key={term.id} className="flex items-start justify-between gap-3 bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md">
+                                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                                            <span className="w-6 shrink-0 text-right font-mono text-sm text-[#AFBD96] pt-1">{index + 1}.</span>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-baseline gap-x-3 flex-wrap">
+                                                    <span className="font-bold text-base text-[#1A2B22] dark:text-white">{term.term}</span>
+                                                    {term.function && <span className="text-sm italic text-[#AFBD96]">{term.function}</span>}
+                                                    {term.ipa && <span className="font-mono text-sm text-[#AFBD96]">{term.ipa}</span>}
+                                                </div>
+                                                <p className="text-sm text-[#1A2B22]/80 dark:text-white/80 mt-1 break-words">{term.definition}</p>
+                                            </div>
+                                        </div>
+                                        {isEditMode && (
+                                            <div className="flex items-center gap-3 pl-2">
+                                                <button onClick={() => handleEditClick(term)} className="text-[#AFBD96] hover:text-[#56A652] transition-colors"><i className="fas fa-pencil-alt"></i></button>
+                                                <button onClick={() => deleteTerm(term.id)} className="text-[#AFBD96] hover:text-[#EE4266] transition-colors"><i className="fas fa-trash-alt"></i></button>
+                                            </div>
+                                        )}
+                                    </li>
+                                )
+                            ))}
+                        </ul>
+                    )}
+                </>
             )}
 
-            {deckTerms.length > 0 && (
-                <ul className="space-y-2 mb-6 max-h-96 overflow-y-auto pr-2">
-                    {deckTerms.map((term, index) => (
-                        editingTermId === term.id ? (
-                            // EDITING VIEW for a single card
-                            <li key={term.id} className="bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md animate-fade-in-fast">
-                                <div className="w-full flex items-start gap-2">
-                                    <span className="pt-2 w-8 text-right font-mono text-[#AFBD96] shrink-0">{index + 1}.</span>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
-                                        <input type="text" placeholder="Term *" value={editedTerm.term} onChange={e => handleEditedTermChange('term', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                        <input type="text" placeholder="Definition *" value={editedTerm.definition} onChange={e => handleEditedTermChange('definition', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                        <input type="text" placeholder="Function" value={editedTerm.function} onChange={e => handleEditedTermChange('function', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                        <input type="text" placeholder="IPA" value={editedTerm.ipa} onChange={e => handleEditedTermChange('ipa', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                    </div>
-                                    <div className="flex flex-col gap-2 pt-1">
-                                        <button onClick={() => handleSaveEdit(term.id)} className="text-[#56A652] hover:brightness-125 transition-transform transform hover:scale-110"><i className="fas fa-save"></i></button>
-                                        <button onClick={handleCancelEdit} className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"><i className="fas fa-times"></i></button>
-                                    </div>
-                                </div>
-                            </li>
-                        ) : (
-                            // DISPLAY VIEW for a single card
-                            <li key={term.id} className="flex items-start justify-between gap-3 bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md">
-                                <div className="flex items-start gap-3 flex-1 min-w-0">
-                                    <span className="w-6 shrink-0 text-right font-mono text-sm text-[#AFBD96] pt-1">{index + 1}.</span>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-baseline gap-x-3 flex-wrap">
-                                            <span className="font-bold text-base text-[#1A2B22] dark:text-white">{term.term}</span>
-                                            {term.function && <span className="text-sm italic text-[#AFBD96]">{term.function}</span>}
-                                            {term.ipa && <span className="font-mono text-sm text-[#AFBD96]">{term.ipa}</span>}
-                                        </div>
-                                        <p className="text-sm text-[#1A2B22]/80 dark:text-white/80 mt-1 break-words">{term.definition}</p>
-                                    </div>
-                                </div>
-                                {isEditMode && (
-                                    <div className="flex items-center gap-3 pl-2">
-                                        <button onClick={() => handleEditClick(term)} className="text-[#AFBD96] hover:text-[#56A652] transition-colors"><i className="fas fa-pencil-alt"></i></button>
-                                        <button onClick={() => deleteTerm(term.id)} className="text-[#AFBD96] hover:text-[#EE4266] transition-colors"><i className="fas fa-trash-alt"></i></button>
-                                    </div>
-                                )}
-                            </li>
-                        )
-                    ))}
-                </ul>
+            {!startInAddMode && isEditMode && isAddingNewCards && (
+                <div className="w-3/4 mx-auto h-px bg-[#EDE9DE] dark:bg-[#3A5A40] my-4"></div>
             )}
 
             {isEditMode && isAddingNewCards && (
                 <form onSubmit={handleSaveNewTerms} className="animate-fade-in-fast">
-                    <div className="flex items-center justify-between mb-3 pt-4 border-t border-[#EDE9DE] dark:border-[#3A5A40]">
-                        <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Add New Cards</h4>
+                    <div className="flex items-center justify-between mb-3 pt-4 px-4">                        <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Add New Cards</h4>
                         <button type="button" onClick={() => setIsImportModalOpen(true)} className="text-sm font-semibold text-[#56A652] hover:underline">
                             <i className="fas fa-file-import mr-2"></i>Bulk Import
                         </button>
                     </div>
-                    <div className="space-y-4 mb-4">
+                    <div className="space-y-4 mb-4 px-4">
                         {newTerms.map((nt, index) => (
                             <div key={index} className="flex items-start gap-2 animate-fade-in-fast">
                                 <span className="pt-2 w-8 text-right font-mono text-[#AFBD96] shrink-0">{index + 1}.</span>
@@ -244,7 +252,7 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                             </div>
                         ))}
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 px-4 justify-center">
                         <button type="button" onClick={addRow} className="bg-[#446843] hover:bg-[#467645] text-white font-bold py-2 px-4 rounded-md transition-colors flex items-center gap-2">
                             <i className="fas fa-plus"></i> Add Row
                         </button>
@@ -315,7 +323,7 @@ export const WordListManager: React.FC = () => {
             setExpandedDeckId(id);
         }
     };
-    
+
     const handleToggleEdit = (e: React.MouseEvent, deckId: number) => {
         e.stopPropagation();
         setNewlyCreatedDeckId(null);
@@ -365,7 +373,7 @@ export const WordListManager: React.FC = () => {
                 {decks.length === 0 && <p className="text-[#AFBD96]">You don't have any decks yet.</p>}
                 {decks.map(deck => (
                     <div key={deck.id} className="bg-white dark:bg-[#344E41] rounded-lg border border-[#EDE9DE] dark:border-[#3A5A40] transition-all duration-300 shadow-md">
-                        <div className="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
+                        <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
                                 <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
                                 <p className="text-[#AFBD96]">{getTermsForDeck(deck.id).length} cards</p>
@@ -374,14 +382,13 @@ export const WordListManager: React.FC = () => {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={(e) => handleToggleEdit(e, deck.id)}
-                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${
-                                            editModeDeckId === deck.id
+                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${editModeDeckId === deck.id
                                                 ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
                                                 : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
-                                        }`}
+                                            }`}
                                     >
-                                        {editModeDeckId === deck.id 
-                                            ? <><i className="fas fa-times mr-2"></i>Cancel</> 
+                                        {editModeDeckId === deck.id
+                                            ? <><i className="fas fa-times mr-2"></i>Cancel</>
                                             : <><i className="fas fa-edit mr-2"></i>Edit</>
                                         }
                                     </button>
@@ -395,7 +402,11 @@ export const WordListManager: React.FC = () => {
                                 <i className={`fas fa-chevron-down text-[#AFBD96] transition-transform duration-300 ${expandedDeckId === deck.id ? 'rotate-180' : ''}`}></i>
                             </div>
                         </div>
-                        {expandedDeckId === deck.id && <DeckEditor deckId={deck.id} isEditMode={editModeDeckId === deck.id} exitEditMode={handleExitEditMode} startInAddMode={deck.id === newlyCreatedDeckId} />}
+                        {expandedDeckId === deck.id && (
+                            <>
+                                <DeckEditor deckId={deck.id} isEditMode={editModeDeckId === deck.id} exitEditMode={handleExitEditMode} startInAddMode={deck.id === newlyCreatedDeckId} />
+                            </>
+                        )}
                     </div>
                 ))}
             </div>

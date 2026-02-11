@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useToast } from '../hooks/useToast';
 
 interface ToastProps {
@@ -31,9 +31,10 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
             if (onTimeout && !undoPressedRef.current) {
                 onTimeout();
             }
+            setRemaining(0); // Ensure remaining is 0 before dismissal
             handleDismiss();
         }, remaining);
-    }, [handleDismiss, onTimeout, remaining]);
+    }, [handleDismiss, onTimeout, remaining, setRemaining]);
 
     const clearTimer = useCallback(() => {
         if (timerRef.current) {
@@ -75,18 +76,30 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
         handleDismiss();
     };
 
-    const [targetWidth, setTargetWidth] = useState('100%');
+    const barRef = useRef<HTMLDivElement>(null); // Reference to the actual bar element
 
     useEffect(() => {
+        if (!barRef.current) return;
+
         if (!isPaused && !isExiting) {
-            // Small delay to ensure the paint has happened
-            const timeout = setTimeout(() => {
-                setTargetWidth('0%');
-            }, 50);
-            return () => clearTimeout(timeout);
+            // When animating:
+            // 1. Set transition to none temporarily to allow width change without immediate animation
+            barRef.current.style.transition = 'none';
+            // 2. Set the starting width based on the current remaining time
+            barRef.current.style.width = `${(remaining / duration) * 100}%`;
+            // 3. Force reflow to apply the width change before starting the transition
+            //    (Accessing offsetHeight triggers a synchronous layout calculation)
+            barRef.current.offsetHeight; 
+
+            // 4. Set the transition property to animate over the current 'remaining' time.
+            barRef.current.style.transition = `width ${remaining}ms linear`;
+            // 5. Then, immediately set the target width to 0% to trigger the animation.
+            barRef.current.style.width = '0%';
         } else {
-            // When paused, we stay at the current calculated width
-            setTargetWidth(`${(remaining / duration) * 100}%`);
+            // When paused or exiting:
+            // Stop animation and set width to current percentage
+            barRef.current.style.transition = 'none';
+            barRef.current.style.width = `${(remaining / duration) * 100}%`;
         }
     }, [isPaused, isExiting, remaining, duration]);
 
@@ -116,11 +129,9 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
             {onUndo && (
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-[#56A652]/20 dark:bg-[#AFBD96]/20">
                     <div
+                        ref={barRef} // Assign ref here
                         className="h-full bg-[#56A652] dark:bg-[#AFBD96]"
-                        style={{
-                            width: targetWidth,
-                            transition: isPaused ? 'none' : `width ${remaining}ms linear`,
-                        }}
+                        // No inline style for width/transition here, managed by useEffect directly
                     />
                 </div>
             )}
