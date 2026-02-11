@@ -189,12 +189,9 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                 </>
             )}
 
-            {!startInAddMode && isEditMode && isAddingNewCards && (
-                <div className="w-3/4 mx-auto h-px bg-[#EDE9DE] dark:bg-[#3A5A40] my-4"></div>
-            )}
-
             {isEditMode && isAddingNewCards && (
                 <form onSubmit={handleSaveNewTerms} className="animate-fade-in-fast">
+                    <div className="w-3/4 mx-auto h-px bg-[#EDE9DE] dark:bg-[#3A5A40] mb-4"></div> {/* Moved divider inside form, adjusted margin */}
                     <div className="flex items-center justify-between mb-3 pt-4 px-4">                        <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Add New Cards</h4>
                         <button type="button" onClick={() => setIsImportModalOpen(true)} className="text-sm font-semibold text-[#56A652] hover:underline">
                             <i className="fas fa-file-import mr-2"></i>Bulk Import
@@ -404,6 +401,9 @@ export const WordListManager: React.FC = () => {
                         </div>
                         {expandedDeckId === deck.id && (
                             <>
+                                {!(deck.id === newlyCreatedDeckId) && ( // Show divider if "Cards in Deck" section is visible
+                                    <div className="w-3/4 mx-auto h-px bg-[#EDE9DE] dark:bg-[#3A5A40] my-2"></div>
+                                )}
                                 <DeckEditor deckId={deck.id} isEditMode={editModeDeckId === deck.id} exitEditMode={handleExitEditMode} startInAddMode={deck.id === newlyCreatedDeckId} />
                             </>
                         )}
