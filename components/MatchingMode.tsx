@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
+import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -9,6 +10,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
+    const { t } = useLanguage();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [gameTerms, setGameTerms] = useState<Term[]>([]);
@@ -70,7 +72,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     }
 
     if (terms.length < 2) {
-        return <p className="text-center text-[#AFBD96]">You need at least 2 terms in this deck to play the matching game.</p>;
+        return <p className="text-center text-[#AFBD96]">{t("You need at least 2 terms in this deck to play the matching game.")}</p>;
     }
 
     const elapsedTime = startTime && currentTime ? currentTime - startTime : 0;
@@ -84,9 +86,9 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     if (isComplete) {
         return (
             <div className="text-center">
-                <h2 className="text-3xl font-bold text-[#0EAD69] mb-4">Congratulations!</h2>
-                <p className="text-[#121e18]/80 dark:text-white/80 mb-6">You've matched all the terms in <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
-                <button onClick={handleRestart} className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">Play Again</button>
+                <h2 className="text-3xl font-bold text-[#0EAD69] mb-4">{t("Congratulations! 🎉")}</h2>
+                <p className="text-[#121e18]/80 dark:text-white/80 mb-6">{t("You've matched all the terms in")} <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
+                <button onClick={handleRestart} className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">{t("Play Again")}</button>
             </div>
         )
     }

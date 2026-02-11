@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
 import { useModal } from '../hooks/useModal';
+import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -12,6 +13,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { showAlert } = useModal();
+    const { t } = useLanguage();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [sessionTerms, setSessionTerms] = useState<Term[]>([]);
@@ -26,8 +28,8 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             window.speechSynthesis.speak(utterance);
         } else {
             showAlert({
-                title: 'Speech Synthesis Not Supported',
-                message: 'Your browser does not support the text-to-speech feature required for this mode.'
+                title: t('Speech Synthesis Not Supported'),
+                message: t('Your browser does not support the text-to-speech feature required for this mode.')
             });
         }
     };
@@ -67,8 +69,8 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     setFeedback(null);
                 } else {
                     showAlert({
-                        title: 'Congratulations!',
-                        message: 'You have completed all spelling terms!'
+                        title: t('Congratulations! 🎉'),
+                        message: t('You have completed all spelling terms!')
                     });
                     setCurrentIndex(0);
                     setSessionTerms(shuffleArray(terms));
@@ -83,7 +85,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (terms.length === 0) {
-        return <p className="text-center text-[#AFBD96]">No terms available in this deck.</p>;
+        return <p className="text-center text-[#AFBD96]">{t("No terms available in this deck.")}</p>;
     }
 
     const currentTerm = sessionTerms[currentIndex];
@@ -95,7 +97,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
     return (
         <div className="max-w-2xl mx-auto text-center">
-            <p className="text-[#AFBD96] mb-2">Term {currentIndex + 1} of {sessionTerms.length}</p>
+            <p className="text-[#AFBD96] mb-2">{t("Term")} {currentIndex + 1} {t("of")} {sessionTerms.length}</p>
             <p className="text-xl text-[#121e18]/80 dark:text-white/80 mb-4">{currentTerm.definition}</p>
             <button onClick={handleSpeak} className="bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] p-4 rounded-full mb-8 text-2xl transition-colors">
                 <i className="fas fa-volume-up"></i>
@@ -106,11 +108,11 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     className={`w-full bg-white dark:bg-[#344E41] text-[#121e18] dark:text-white text-2xl text-center py-4 px-6 rounded-lg border-2 ${inputBorderColor} outline-none transition-all duration-300`}
-                    placeholder="Type the term here"
+                    placeholder={t("Type the term here")}
                     autoFocus
                 />
                 <button type="submit" className="mt-6 bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors">
-                    Check
+                    {t("Check")}
                 </button>
             </form>
         </div>

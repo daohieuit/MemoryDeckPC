@@ -1,7 +1,109 @@
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --animate-fade-in-fast: fade-in-fast 0.3s ease-out forwards;
+  --animate-fade-out-fast: fade-out-fast 0.3s ease-in forwards;
+  --animate-scale-in: scale-in 0.2s ease-out forwards;
+  --animate-scale-out: scale-out 0.2s ease-in forwards;
+  --animate-shake: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+
+  @keyframes fade-in-fast {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-out-fast {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes progress-bar {
+    from {
+      width: 100%;
+    }
+
+    to {
+      width: 0%;
+    }
+  }
+
+  @keyframes scale-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes scale-out {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  @keyframes shake {
+
+    10%,
+    90% {
+      transform: translateX(-1px);
+    }
+
+    20%,
+    80% {
+      transform: translateX(2px);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translateX(-4px);
+    }
+
+    40%,
+    60% {
+      transform: translateX(4px);
+    }
+  }
+}
+
+@utility transform-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@utility rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
 
 /**
  * Custom Scrollbar Styling
@@ -23,7 +125,7 @@
 /* The "thumb" is the draggable part of the scrollbar. */
 ::-webkit-scrollbar-thumb {
   /* Light mode thumb color, matches UI elements. */
-  background-color: #CDC6AE; 
+  background-color: #CDC6AE;
   border-radius: 20px;
   /* Creates a "padding" effect around the thumb, making it look thinner. */
   border: 2px solid transparent;

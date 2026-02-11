@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
+import { useLanguage } from '../hooks/useLanguage';
 import { Term, ProgressStatus } from '../types';
 
 export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, getProgressForTerm, updateProgress } = useWords();
+    const { t } = useLanguage();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -70,7 +72,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (terms.length === 0) {
-        return <p className="text-center text-[#AFBD96]">No terms available in this deck.</p>;
+        return <p className="text-center text-[#AFBD96]">{t("No terms available in this deck.")}</p>;
     }
 
     const currentTerm = sessionTerms[currentIndex];
@@ -105,20 +107,20 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         {currentTerm.ipa && (
                             <p className="text-2xl text-[#AFBD96] font-mono">{currentTerm.ipa}</p>
                         )}
-                        <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
+                        <div className="absolute bottom-4 text-xs text-[#AFBD96]">{t("Click to flip")}</div>
                     </div>
                     {/* Back of card */}
                     <div className="absolute w-full h-full backface-hidden bg-[#F1F5F9] dark:bg-[#446843] border border-[#EDE9DE] dark:border-[#3A5A40] rounded-lg flex flex-col justify-center items-center p-6 cursor-pointer shadow-lg rotate-y-180">
                         <p className="text-3xl text-[#121e18] dark:text-white text-center">{currentTerm.definition}</p>
-                        <div className="absolute bottom-4 text-xs text-[#AFBD96]">Click to flip</div>
+                        <div className="absolute bottom-4 text-xs text-[#AFBD96]">{t("Click to flip")}</div>
                     </div>
                 </div>
             </div>
 
             <div className="flex space-x-4">
-                <button onClick={() => handleNext('hard')} className="bg-[#EE4266] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">Hard</button>
-                <button onClick={() => handleNext('good')} className="bg-[#FFD23F] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">Good</button>
-                <button onClick={() => handleNext('easy')} className="bg-[#0EAD69] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">Easy</button>
+                <button onClick={() => handleNext('hard')} className="bg-[#EE4266] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">{t("Hard 😵")}</button>
+                <button onClick={() => handleNext('good')} className="bg-[#FFD23F] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">{t("Good 👍")}</button>
+                <button onClick={() => handleNext('easy')} className="bg-[#0EAD69] text-white font-bold py-3 px-8 rounded-lg hover:brightness-90 transition-transform transform hover:scale-105">{t("Easy 😎")}</button>
             </div>
         </div>
     );

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useToast } from './useToast';
 import { useModal } from './useModal';
+import { useLanguage } from './useLanguage';
 import { Deck, Term, Progress, ProgressStatus } from '../types';
 
 declare global {
@@ -49,6 +50,7 @@ const WordsContext = createContext<WordsContextType | undefined>(undefined);
 export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { showToast } = useToast();
     const { showConfirm } = useModal();
+    const { t } = useLanguage();
     const [decks, setDecks] = useState<Deck[]>([]);
     const [terms, setTerms] = useState<Term[]>([]);
     const [progress, setProgress] = useState<Progress[]>([]);
@@ -110,9 +112,9 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const deleteDeck = useCallback((id: number) => {
         showConfirm({
-            title: 'Delete Deck',
-            message: 'Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.',
-            confirmText: 'Delete',
+            title: t('Delete Deck'),
+            message: t('Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.'),
+            confirmText: t('Delete'),
             confirmVariant: 'danger',
             onConfirm: async () => {
                 if (window.electronAPI) {
@@ -195,40 +197,89 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
     }, []);
 
-    const deleteTerm = useCallback((termId: number) => {
-        const termToDelete = terms.find(t => t.id === termId);
-        if (!termToDelete) return;
-
-        const progressToDelete = progress.find(p => p.term_id === termId);
-
-        // Optimistically update state
-        setTerms(prev => prev.filter(t => t.id !== termId));
-        setProgress(prev => prev.filter(p => p.term_id !== termId));
-
-        const handleUndo = () => {
-            setTerms(prev => [...prev, termToDelete].sort((a, b) => a.id - b.id));
-            if (progressToDelete) {
-                setProgress(prev => [...prev, progressToDelete].sort((a, b) => a.term_id - b.term_id));
+    const deleteTerm = useCallback(async (termId: number) => {
+        try {
+            const termToDelete = terms.find(t => t.id === termId);
+            if (!termToDelete) {
+                console.error('deleteTerm: Term not found with id:', termId);
+                return;
             }
-        };
 
-        const handlePermanentDelete = () => {
+            const progressToDelete = progress.find(p => p.term_id === termId);
+
+            // Delete from database IMMEDIATELY to handle app-close scenario
             if (window.electronAPI) {
-                window.electronAPI.db.deleteTerm(termId);
+                console.log('deleteTerm: Deleting from SQLite, termId:', termId);
+                await window.electronAPI.db.deleteTerm(termId);
+                console.log('deleteTerm: SQLite delete successful');
             } else {
+                // For web fallback, persist the filtered state immediately
                 const newTerms = terms.filter(t => t.id !== termId);
                 const newProgress = progress.filter(p => p.term_id !== termId);
                 persistWeb('terms', newTerms);
                 persistWeb('progress', newProgress);
             }
-        };
 
-        showToast({
-            message: `Deleted "${termToDelete.term}"`,
-            duration: 5000,
-            onUndo: handleUndo,
-            onTimeout: handlePermanentDelete,
-        });
+            // Update React state (UI updates instantly)
+            setTerms(prev => prev.filter(t => t.id !== termId));
+            setProgress(prev => prev.filter(p => p.term_id !== termId));
+
+            const handleUndo = async () => {
+                try {
+                    // Restore to database
+                    if (window.electronAPI) {
+                        // Re-add the term to the database (will get the same ID due to SQLite re-insertion)
+                        const newId = await window.electronAPI.db.addTerm(
+                            termToDelete.deck_id,
+                            termToDelete.term,
+                            termToDelete.definition,
+                            termToDelete.ipa,
+                            termToDelete.function
+                        );
+
+                        // Restore term with the new database ID
+                        const restoredTerm: Term = { ...termToDelete, id: newId };
+                        setTerms(prev => [...prev, restoredTerm].sort((a, b) => a.id - b.id));
+
+                        // Restore progress if it existed, linking to the new term ID
+                        if (progressToDelete) {
+                            await window.electronAPI.db.updateProgress(
+                                newId,
+                                progressToDelete.status,
+                                progressToDelete.last_reviewed
+                            );
+                            const restoredProgress: Progress = { ...progressToDelete, term_id: newId };
+                            setProgress(prev => [...prev, restoredProgress].sort((a, b) => a.term_id - b.term_id));
+                        }
+                    } else {
+                        // For web fallback, restore using current state to avoid stale closures
+                        setTerms(prev => {
+                            const updated = [...prev, termToDelete].sort((a, b) => a.id - b.id);
+                            persistWeb('terms', updated);
+                            return updated;
+                        });
+                        if (progressToDelete) {
+                            setProgress(prev => {
+                                const updated = [...prev, progressToDelete].sort((a, b) => a.term_id - b.term_id);
+                                persistWeb('progress', updated);
+                                return updated;
+                            });
+                        }
+                    }
+                } catch (undoError) {
+                    console.error('deleteTerm: Undo failed:', undoError);
+                }
+            };
+
+            showToast({
+                message: t('Deleted "..."').replace('...', termToDelete.term),
+                duration: 5000,
+                onUndo: handleUndo,
+                // No onTimeout needed - deletion is already persisted
+            });
+        } catch (error) {
+            console.error('deleteTerm: Error occurred:', error);
+        }
     }, [terms, progress, showToast]);
 
     const getTermsForDeck = useCallback((deckId: number) => {

@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
         getTerms: () => ipcRenderer.invoke('db:getTerms'),
         addTerm: (deckId, term, definition, ipa, functionValue) => ipcRenderer.invoke('db:addTerm', deckId, term, definition, ipa, functionValue),
+        updateTerm: (termId, termData) => ipcRenderer.invoke('db:updateTerm', termId, termData),
+        deleteTerm: (termId) => ipcRenderer.invoke('db:deleteTerm', termId),
 
         getAllProgress: () => ipcRenderer.invoke('db:getAllProgress'),
         updateProgress: (termId, status, lastReviewed) =>

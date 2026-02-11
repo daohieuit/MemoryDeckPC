@@ -1,7 +1,8 @@
 {
   "name": "memorydeck",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
@@ -15,6 +16,7 @@
   "build": {
     "appId": "com.memorydeck.app",
     "productName": "MemoryDeck",
+    "icon": "public/assets/images/MD_logo_1024x1024.png",
     "win": {
       "target": "nsis",
       "artifactName": "MemoryDeck_${version}_installer.${ext}"
@@ -36,6 +38,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.39.0",
+    "@tailwindcss/postcss": "^4.1.18",
     "better-sqlite3": "^12.6.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -43,13 +46,17 @@
   },
   "devDependencies": {
     "@electron/rebuild": "^4.0.3",
+    "@tailwindcss/vite": "^4.1.18",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.24",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
-    "electron": "^40.2.1",
+    "electron": "^40.3.0",
     "electron-builder": "^26.7.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "wait-on": "^8.0.2"
