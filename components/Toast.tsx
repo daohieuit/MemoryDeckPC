@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useToast } from '../hooks/useToast';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface ToastProps {
     id: number;
@@ -14,6 +15,7 @@ interface ToastProps {
 const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, onUndo, onTimeout }) => {
     const [isExiting, setIsExiting] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const { t } = useLanguage();
     const [remaining, setRemaining] = useState(duration);
     const undoPressedRef = React.useRef(false);
     const startTimeRef = React.useRef(Date.now());
@@ -89,7 +91,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
             barRef.current.style.width = `${(remaining / duration) * 100}%`;
             // 3. Force reflow to apply the width change before starting the transition
             //    (Accessing offsetHeight triggers a synchronous layout calculation)
-            barRef.current.offsetHeight; 
+            barRef.current.offsetHeight;
 
             // 4. Set the transition property to animate over the current 'remaining' time.
             barRef.current.style.transition = `width ${remaining}ms linear`;
@@ -117,7 +119,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
                     <div className="ml-4 flex-shrink-0 flex items-center">
                         {onUndo && (
                             <button onClick={handleUndoClick} className="mr-4 text-sm font-semibold text-[#56A652] hover:underline focus:outline-none">
-                                Undo
+                                {t("Undo")}
                             </button>
                         )}
                         <button onClick={handleCloseClick} className="text-[#AFBD96] hover:text-[#121e18] dark:hover:text-white focus:outline-none">
@@ -131,7 +133,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, duration = 5000, onDismiss, 
                     <div
                         ref={barRef} // Assign ref here
                         className="h-full bg-[#56A652] dark:bg-[#AFBD96]"
-                        // No inline style for width/transition here, managed by useEffect directly
+                    // No inline style for width/transition here, managed by useEffect directly
                     />
                 </div>
             )}

@@ -13,6 +13,11 @@ MemoryDeck organizes vocabulary into **Decks**. Think of a Deck as a subject or 
 2. Under **"Create New Deck"**, type a name (e.g., "Daily Phrases" or "Unit 1").
 3. Click **"Create Deck"**. The app will automatically open the editor for your new deck.
 
+### Accessing Deck Editor
+You can access the deck editor in two ways:
+1.  **From the Dashboard**: On the main Dashboard, each deck now features a small pencil icon ✎ in its top-right corner. Clicking this icon will take you directly to the "My Decks" page with that specific deck expanded and ready for editing.
+2.  **From My Decks Page**: Navigate to the "My Decks" page, find your desired deck, and click the "Edit" button.
+
 ### Adding and Editing Cards
 1. In the **"My Decks"** list, find your deck and click it to expand the details.
 2. Click the **"Edit"** button to enter editing mode.

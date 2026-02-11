@@ -1,7 +1,9 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useWords } from '../hooks/useWords';
+import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
+import { useParams } from 'react-router-dom';
 
 const formatIPA = (ipa: string): string => {
     const content = ipa.trim().replace(/^\/|\/$/g, '').trim();
@@ -19,6 +21,7 @@ const formatFunction = (func: string): string => {
 
 const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: () => void, startInAddMode?: boolean }> = ({ deckId, isEditMode, exitEditMode, startInAddMode }) => {
     const { getTermsForDeck, addTermsToDeck, updateTerm, deleteTerm } = useWords();
+    const { t } = useLanguage();
     const [newTerms, setNewTerms] = useState([{ term: '', definition: '', function: '', ipa: '' }]);
     const deckTerms = getTermsForDeck(deckId);
 
@@ -124,7 +127,7 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                 <>
                     <div className="flex justify-between items-center mb-3 px-4">
                         {!startInAddMode && (
-                            <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Cards in this Deck</h4>
+                            <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">{t("Cards in this Deck")}</h4>
                         )}                {isEditMode && !isAddingNewCards && (
                             <button
                                 type="button"
@@ -132,13 +135,13 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                                 className="bg-[#446843] hover:bg-[#467645] text-white font-bold py-1 px-3 rounded-md transition-colors flex items-center gap-2 text-sm"
                                 aria-label="Add new cards"
                             >
-                                <i className="fas fa-plus"></i> Add New
+                                <i className="fas fa-plus"></i> {t("Add New")}
                             </button>
                         )}
                     </div>
 
                     {deckTerms.length === 0 && !isEditMode && (
-                        <p className="text-[#AFBD96] italic text-sm my-4 px-4">This deck is empty. Click 'Edit' to add your first card.</p>
+                        <p className="text-[#AFBD96] italic text-sm my-4 px-4">{t("This deck is empty. Click 'Edit' to add your first card.")}</p>
                     )}
 
                     {deckTerms.length > 0 && (
@@ -150,10 +153,10 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                                         <div className="w-full flex items-start gap-2">
                                             <span className="pt-2 w-8 text-right font-mono text-[#AFBD96] shrink-0">{index + 1}.</span>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
-                                                <input type="text" placeholder="Term *" value={editedTerm.term} onChange={e => handleEditedTermChange('term', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                                <input type="text" placeholder="Definition *" value={editedTerm.definition} onChange={e => handleEditedTermChange('definition', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                                <input type="text" placeholder="Function" value={editedTerm.function} onChange={e => handleEditedTermChange('function', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
-                                                <input type="text" placeholder="IPA" value={editedTerm.ipa} onChange={e => handleEditedTermChange('ipa', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder={t("Term *")} value={editedTerm.term} onChange={e => handleEditedTermChange('term', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder={t("Definition *")} value={editedTerm.definition} onChange={e => handleEditedTermChange('definition', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder={t("Function")} value={editedTerm.function} onChange={e => handleEditedTermChange('function', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
+                                                <input type="text" placeholder={t("IPA")} value={editedTerm.ipa} onChange={e => handleEditedTermChange('ipa', e.target.value)} className="bg-white dark:bg-[#344E41] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#CDC6AE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]" />
                                             </div>
                                             <div className="flex flex-col gap-2 pt-1">
                                                 <button onClick={() => handleSaveEdit(term.id)} className="text-[#56A652] hover:brightness-125 transition-transform transform hover:scale-110"><i className="fas fa-save"></i></button>
@@ -192,9 +195,9 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
             {isEditMode && isAddingNewCards && (
                 <form onSubmit={handleSaveNewTerms} className="animate-fade-in-fast">
                     <div className="w-3/4 mx-auto h-px bg-[#EDE9DE] dark:bg-[#3A5A40] mb-4"></div> {/* Moved divider inside form, adjusted margin */}
-                    <div className="flex items-center justify-between mb-3 pt-4 px-4">                        <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">Add New Cards</h4>
+                    <div className="flex items-center justify-between mb-3 pt-4 px-4">                        <h4 className="text-lg font-semibold text-[#1A2B22] dark:text-white/90">{t("Add New Cards")}</h4>
                         <button type="button" onClick={() => setIsImportModalOpen(true)} className="text-sm font-semibold text-[#56A652] hover:underline">
-                            <i className="fas fa-file-import mr-2"></i>Bulk Import
+                            <i className="fas fa-file-import mr-2"></i>{t("Bulk Import")}
                         </button>
                     </div>
                     <div className="space-y-4 mb-4 px-4">
@@ -204,21 +207,21 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
                                     <input
                                         type="text"
-                                        placeholder="Term *"
+                                        placeholder={t("Term *")}
                                         value={nt.term}
                                         onChange={(e) => handleNewTermChange(index, 'term', e.target.value)}
                                         className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                     />
                                     <input
                                         type="text"
-                                        placeholder="Definition *"
+                                        placeholder={t("Definition *")}
                                         value={nt.definition}
                                         onChange={(e) => handleNewTermChange(index, 'definition', e.target.value)}
                                         className="bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-3 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                                     />
                                     <input
                                         type="text"
-                                        placeholder="Function (e.g., n, adj, adv, v)"
+                                        placeholder={t("Function (e.g., n, adj, adv, v)")}
                                         value={nt.function}
                                         onChange={(e) => handleNewTermChange(index, 'function', e.target.value)}
                                         onBlur={(e) => {
@@ -231,7 +234,7 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                                     />
                                     <input
                                         type="text"
-                                        placeholder="IPA (Optional)"
+                                        placeholder={t("IPA (Optional)")}
                                         value={nt.ipa}
                                         onChange={(e) => handleNewTermChange(index, 'ipa', e.target.value)}
                                         onBlur={(e) => {
@@ -251,10 +254,10 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                     </div>
                     <div className="flex gap-4 px-4 justify-center">
                         <button type="button" onClick={addRow} className="bg-[#446843] hover:bg-[#467645] text-white font-bold py-2 px-4 rounded-md transition-colors flex items-center gap-2">
-                            <i className="fas fa-plus"></i> Add Row
+                            <i className="fas fa-plus"></i> {t("Add Row")}
                         </button>
                         <button type="submit" className="bg-[#56A652] hover:brightness-90 text-white font-bold py-2 px-4 rounded-md transition-colors flex items-center gap-2">
-                            <i className="fas fa-save"></i> Save Cards
+                            <i className="fas fa-save"></i> {t("Save Cards")}
                         </button>
                     </div>
                 </form>
@@ -263,10 +266,10 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
             {isImportModalOpen && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-fast p-4">
                     <div className="bg-white dark:bg-[#344E41] rounded-lg shadow-xl p-6 w-full max-w-2xl border border-[#EDE9DE] dark:border-[#3A5A40]">
-                        <h2 className="text-2xl font-bold mb-4">Bulk Import Cards</h2>
-                        <p className="text-[#AFBD96] mb-2">Paste your card data below. Each new line represents a separate card.</p>
+                        <h2 className="text-2xl font-bold mb-4">{t("Bulk Import Cards")}</h2>
+                        <p className="text-[#AFBD96] mb-2">{t("Paste your card data below. Each new line represents a separate card.")}</p>
                         <div className="text-sm bg-[#e8e5da] dark:bg-[#446843]/50 p-3 rounded-md mb-4 border border-[#EDE9DE] dark:border-[#3A5A40]/50">
-                            <p className="font-semibold text-[#1A2B22] dark:text-white">Supported Formats (use Tab to separate fields):</p>
+                            <p className="font-semibold text-[#1A2B22] dark:text-white">{t("Supported Formats (use Tab to separate fields):")}</p>
                             <code className="block mt-2 text-[#1A2B22]/80 dark:text-white/80">[Term] (Tab) [Definition]</code>
                             <code className="block mt-1 text-[#1A2B22]/80 dark:text-white/80">[Term] (Tab) [Function] (Tab) [IPA] (Tab) [Definition]</code>
                         </div>
@@ -278,8 +281,8 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
                             placeholder={"Term 1\tDefinition 1\nTerm 2\tn\t/ipa/\tDefinition 2"}
                         />
                         <div className="flex justify-end gap-4 mt-4">
-                            <button type="button" onClick={() => setIsImportModalOpen(false)} className="px-4 py-2 rounded-md text-[#1A2B22] dark:text-white bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">Cancel</button>
-                            <button type="button" onClick={handleImport} className="px-4 py-2 rounded-md text-white bg-[#56A652] hover:brightness-90 transition-colors font-semibold">Import Cards</button>
+                            <button type="button" onClick={() => setIsImportModalOpen(false)} className="px-4 py-2 rounded-md text-[#1A2B22] dark:text-white bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors">{t("Cancel")}</button>
+                            <button type="button" onClick={handleImport} className="px-4 py-2 rounded-md text-white bg-[#56A652] hover:brightness-90 transition-colors font-semibold">{t("Import Cards")}</button>
                         </div>
                     </div>
                 </div>
@@ -291,10 +294,23 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
 
 export const WordListManager: React.FC = () => {
     const { decks, addDeck, deleteDeck, getTermsForDeck } = useWords();
+    const { t } = useLanguage();
     const [newDeckName, setNewDeckName] = useState('');
-    const [expandedDeckId, setExpandedDeckId] = useState<number | null>(null);
-    const [editModeDeckId, setEditModeDeckId] = useState<number | null>(null);
+    const { deckId: paramDeckId } = useParams<{ deckId: string }>();
+
+    const initialDeckId = paramDeckId ? parseInt(paramDeckId) : null;
+
+    const [expandedDeckId, setExpandedDeckId] = useState<number | null>(initialDeckId);
+    const [editModeDeckId, setEditModeDeckId] = useState<number | null>(initialDeckId);
     const [newlyCreatedDeckId, setNewlyCreatedDeckId] = useState<number | null>(null);
+
+    // If a deckId is provided in the URL, ensure it's expanded and in edit mode
+    useEffect(() => {
+        if (initialDeckId && !expandedDeckId) {
+            setExpandedDeckId(initialDeckId);
+            setEditModeDeckId(initialDeckId);
+        }
+    }, [initialDeckId]);
 
     // FIX: The `addDeck` function returns a promise. We need to `await` its result
     // before using it to set state, which requires this handler to be `async`.
@@ -343,16 +359,16 @@ export const WordListManager: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold mb-6">Manage My Decks</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-6">{t("Manage My Decks")}</h1>
 
             <div className="bg-white dark:bg-[#344E41] p-6 rounded-lg shadow-lg border border-[#EDE9DE] dark:border-[#3A5A40] mb-8">
-                <h2 className="text-2xl font-bold mb-4">Create New Deck</h2>
+                <h2 className="text-2xl font-bold mb-4">{t("Create New Deck")}</h2>
                 <form onSubmit={handleAddDeck} className="flex flex-col sm:flex-row gap-4">
                     <input
                         type="text"
                         value={newDeckName}
                         onChange={(e) => setNewDeckName(e.target.value)}
-                        placeholder="e.g., TOEIC Vocabulary"
+                        placeholder={t("e.g., TOEIC Vocabulary")}
                         className="flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
                     />
                     <button
@@ -360,40 +376,40 @@ export const WordListManager: React.FC = () => {
                         disabled={!newDeckName.trim()}
                         className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
                     >
-                        <i className="fas fa-plus mr-2"></i> Create Deck
+                        <i className="fas fa-plus mr-2"></i> {t("Create Deck")}
                     </button>
                 </form>
             </div>
 
             <div className="space-y-4">
-                <h2 className="text-2xl font-bold border-b border-[#EDE9DE] dark:border-[#3A5A40] pb-2">Your Decks</h2>
-                {decks.length === 0 && <p className="text-[#AFBD96]">You don't have any decks yet.</p>}
+                <h2 className="text-2xl font-bold border-b border-[#EDE9DE] dark:border-[#3A5A40] pb-2">{t("Your Decks")}</h2>
+                {decks.length === 0 && <p className="text-[#AFBD96]">{t("You don't have any decks yet.")}</p>}
                 {decks.map(deck => (
                     <div key={deck.id} className="bg-white dark:bg-[#344E41] rounded-lg border border-[#EDE9DE] dark:border-[#3A5A40] transition-all duration-300 shadow-md">
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
                                 <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
-                                <p className="text-[#AFBD96]">{getTermsForDeck(deck.id).length} cards</p>
+                                <p className="text-[#AFBD96]">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={(e) => handleToggleEdit(e, deck.id)}
                                         className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${editModeDeckId === deck.id
-                                                ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
-                                                : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
+                                            ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
+                                            : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
                                             }`}
                                     >
                                         {editModeDeckId === deck.id
-                                            ? <><i className="fas fa-times mr-2"></i>Cancel</>
-                                            : <><i className="fas fa-edit mr-2"></i>Edit</>
+                                            ? <><i className="fas fa-times mr-2"></i>{t("Cancel")}</>
+                                            : <><i className="fas fa-edit mr-2"></i>{t("Edit")}</>
                                         }
                                     </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); deleteDeck(deck.id); }}
                                         className="text-[#EE4266] hover:brightness-90 bg-[#EE4266]/20 dark:bg-[#EE4266]/30 hover:bg-[#EE4266]/30 dark:hover:bg-[#EE4266]/40 px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center"
                                     >
-                                        <i className="fas fa-trash-alt mr-2"></i> Delete
+                                        <i className="fas fa-trash-alt mr-2"></i> {t("Delete")}
                                     </button>
                                 </div>
                                 <i className={`fas fa-chevron-down text-[#AFBD96] transition-transform duration-300 ${expandedDeckId === deck.id ? 'rotate-180' : ''}`}></i>

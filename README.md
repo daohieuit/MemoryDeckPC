@@ -72,7 +72,8 @@ Expand your knowledge of MemoryDeck by exploring our specialized guides:
 ---
 
 ## ✨ Features at a Glance
-- **Custom Decks**: Organize your learning into specialized categories (Decks).
+-   **Quick Edit Access**: Edit any deck directly from the Dashboard for faster management.
+-   **Custom Decks**: Organize your learning into specialized categories (Decks).
 - **Spaced Repetition**: Enhanced flashcards with "Easy", "Good", and "Hard" feedback loops to optimize review frequency.
 - **Multi-Modal Learning**: Quiz, Matching Game, and a voice-powered **Spelling Check** mode.
 - **Premium Aesthetics**: Modern interface with glassmorphism, smooth animations, and automatic Dark Mode persistence.

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useToast } from './useToast';
 import { useModal } from './useModal';
+import { useLanguage } from './useLanguage';
 import { Deck, Term, Progress, ProgressStatus } from '../types';
 
 declare global {
@@ -49,6 +50,7 @@ const WordsContext = createContext<WordsContextType | undefined>(undefined);
 export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { showToast } = useToast();
     const { showConfirm } = useModal();
+    const { t } = useLanguage();
     const [decks, setDecks] = useState<Deck[]>([]);
     const [terms, setTerms] = useState<Term[]>([]);
     const [progress, setProgress] = useState<Progress[]>([]);
@@ -110,9 +112,9 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const deleteDeck = useCallback((id: number) => {
         showConfirm({
-            title: 'Delete Deck',
-            message: 'Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.',
-            confirmText: 'Delete',
+            title: t('Delete Deck'),
+            message: t('Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.'),
+            confirmText: t('Delete'),
             confirmVariant: 'danger',
             onConfirm: async () => {
                 if (window.electronAPI) {
@@ -270,7 +272,7 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
             };
 
             showToast({
-                message: `Deleted "${termToDelete.term}"`,
+                message: t('Deleted "..."').replace('...', termToDelete.term),
                 duration: 5000,
                 onUndo: handleUndo,
                 // No onTimeout needed - deletion is already persisted

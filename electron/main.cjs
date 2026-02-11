@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const { initDatabase, dbOps } = require('./db.cjs');
 
@@ -34,6 +34,32 @@ function createWindow() {
         },
         title: "Memorydeck",
         autoHideMenuBar: true,
+        icon: path.join(__dirname, '../public/assets/images/MD_logo_1024x1024.png'), // Set application icon
+    });
+
+    // Set CSP via headers
+    mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+        if (details.resourceType === 'mainFrame' || details.resourceType === 'document') {
+            const csp = `
+                default-src 'self' http://localhost:3000 https://esm.sh;
+                script-src 'self' 'unsafe-inline' http://localhost:3000 https://esm.sh;
+                style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+                img-src 'self' data: http://localhost:3000;
+                connect-src 'self' http://localhost:3000;
+                font-src 'self' https://cdnjs.cloudflare.com;
+                object-src 'none';
+                media-src 'none';
+                frame-src 'none';
+            `.replace(/\s+/g, ' ').trim();
+            callback({
+                responseHeaders: {
+                    ...details.responseHeaders,
+                    'Content-Security-Policy': [csp]
+                }
+            });
+        } else {
+            callback({ responseHeaders: details.responseHeaders });
+        }
     });
 
     if (isDev) {

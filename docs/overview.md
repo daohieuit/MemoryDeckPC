@@ -16,6 +16,9 @@ Traditional learning often relies on passive reading, which creates an "illusion
 
 ## ⭐ Core Features
 
+### Quick Deck Editing
+Users can now instantly access a deck's editing interface directly from the Dashboard, streamlining the workflow for managing and updating their vocabulary.
+
 ### The "Deck" Ecosystem
 Users organize information into modular "Decks." This modularity allows for focused study sessions, preventing cognitive overload and allowing for categorical mastery.
 

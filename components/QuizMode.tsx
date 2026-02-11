@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useWords } from '../hooks/useWords';
 import { useModal } from '../hooks/useModal';
+import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 
 // Utility to shuffle an array
@@ -18,6 +19,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { showAlert } = useModal();
+    const { t } = useLanguage();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -71,8 +73,8 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         } else {
             // End of quiz
             showAlert({
-                title: 'Quiz Finished!',
-                message: `Your score: ${score}/${shuffledTerms.length}`
+                title: t('Quiz Finished!'),
+                message: `${t('Your score:')} ${score}/${shuffledTerms.length}`
             });
             setCurrentQuestionIndex(0);
             setScore(0);
@@ -80,7 +82,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (terms.length < 4) {
-        return <p className="text-center text-[#AFBD96]">You need at least 4 terms in this deck to start a quiz.</p>;
+        return <p className="text-center text-[#AFBD96]">{t("You need at least 4 terms in this deck to start a quiz.")}</p>;
     }
 
     const currentTerm = shuffledTerms[currentQuestionIndex];
@@ -88,9 +90,9 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
     return (
         <div className="max-w-3xl mx-auto text-center">
-            <p className="text-[#AFBD96] mb-2">Question {currentQuestionIndex + 1} of {shuffledTerms.length}</p>
+            <p className="text-[#AFBD96] mb-2">{t("Question")} {currentQuestionIndex + 1} {t("of")} {shuffledTerms.length}</p>
             <h2 className="text-4xl font-bold mb-4">{currentTerm.term}</h2>
-            <p className="text-xl text-[#121e18]/80 dark:text-white/80 mb-8">Which of the following best defines this term?</p>
+            <p className="text-xl text-[#121e18]/80 dark:text-white/80 mb-8">{t("Which of the following best defines this term?")}</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {options.map(option => {
@@ -120,14 +122,14 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             {selectedAnswer !== null && (
                 <div className="flex flex-col items-center">
                     <p className={`text-2xl font-bold mb-4 ${isCorrect ? 'text-[#0EAD69]' : 'text-[#EE4266]'}`}>
-                        {isCorrect ? 'Correct!' : 'Incorrect!'}
+                        {isCorrect ? t('Correct! 🎯') : t('Incorrect!')}
                     </p>
-                    {!isCorrect && <p className="mb-4 text-[#121e18]/80 dark:text-white/80">The correct answer was: {currentTerm.definition}</p>}
+                    {!isCorrect && <p className="mb-4 text-[#121e18]/80 dark:text-white/80">{t("The correct answer was:")} {currentTerm.definition}</p>}
                     <button
                         onClick={handleNext}
                         className="bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors"
                     >
-                        {currentQuestionIndex < shuffledTerms.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                        {currentQuestionIndex < shuffledTerms.length - 1 ? t('Next Question') : t('Finish Quiz')}
                     </button>
                 </div>
             )}

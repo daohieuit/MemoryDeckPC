@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useModal, ModalOptions } from '../hooks/useModal';
+import { useLanguage } from '../hooks/useLanguage';
 
 const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
     title,
@@ -11,6 +12,7 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
     onDismiss
 }) => {
     const [isExiting, setIsExiting] = useState(false);
+    const { t } = useLanguage();
 
     const handleClose = () => {
         setIsExiting(true);
@@ -49,14 +51,14 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
                                 onClick={handleClose}
                                 className="px-4 py-2 rounded-md text-[#121e18] dark:text-white bg-[#e8e5da] dark:bg-[#344e41] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-medium"
                             >
-                                Cancel
+                                {t("Cancel")}
                             </button>
                             <button
                                 type="button"
                                 onClick={handleConfirm}
                                 className={`px-4 py-2 rounded-md transition-colors font-semibold ${confirmClasses[confirmVariant]}`}
                             >
-                                {confirmText || 'Confirm'}
+                                {confirmText || t('Confirm')}
                             </button>
                         </>
                     ) : (
@@ -65,7 +67,7 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
                             onClick={handleClose}
                             className="px-4 py-2 rounded-md text-white bg-[#56A652] hover:brightness-90 transition-colors font-semibold"
                         >
-                            OK
+                            {t("OK")}
                         </button>
                     )}
                 </div>
