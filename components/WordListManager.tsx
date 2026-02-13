@@ -296,7 +296,23 @@ export const WordListManager: React.FC = () => {
     const { decks, addDeck, deleteDeck, getTermsForDeck } = useWords();
     const { t } = useLanguage();
     const [newDeckName, setNewDeckName] = useState('');
+    const [deckNameError, setDeckNameError] = useState<string | null>(null);
     const { deckId: paramDeckId } = useParams<{ deckId: string }>();
+
+    const validateDeckName = (name: string): string | null => {
+        if (!name.trim()) {
+            return t("Deck name cannot be empty.");
+        }
+        // Regex for alphanumeric and spaces
+        if (!/^[a-zA-Z0-9 ]*$/.test(name)) {
+            return t("Deck name contains invalid characters. Only letters, numbers, and spaces are allowed.");
+        }
+        // Uniqueness check
+        if (decks.some(deck => deck.name.toLowerCase() === name.trim().toLowerCase())) {
+            return t("A deck with this name already exists.");
+        }
+        return null; // No error
+    };
 
     const initialDeckId = paramDeckId ? parseInt(paramDeckId) : null;
 
@@ -316,14 +332,22 @@ export const WordListManager: React.FC = () => {
     // before using it to set state, which requires this handler to be `async`.
     const handleAddDeck = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newDeckName.trim()) {
-            const newId = await addDeck(newDeckName.trim());
-            setNewDeckName('');
-            // Automatically expand and enter edit mode for new decks
-            setExpandedDeckId(newId);
-            setEditModeDeckId(newId);
-            setNewlyCreatedDeckId(newId);
+        const trimmedName = newDeckName.trim();
+        const error = validateDeckName(trimmedName);
+
+        if (error) {
+            setDeckNameError(error);
+            return;
         }
+
+        setDeckNameError(null); // Clear previous errors
+
+        const newId = await addDeck(trimmedName);
+        setNewDeckName('');
+        // Automatically expand and enter edit mode for new decks
+        setExpandedDeckId(newId);
+        setEditModeDeckId(newId);
+        setNewlyCreatedDeckId(newId);
     };
 
     const toggleDeck = (id: number) => {
@@ -363,21 +387,28 @@ export const WordListManager: React.FC = () => {
 
             <div className="bg-white dark:bg-[#344E41] p-6 rounded-lg shadow-lg border border-[#EDE9DE] dark:border-[#3A5A40] mb-8">
                 <h2 className="text-2xl font-bold mb-4">{t("Create New Deck")}</h2>
-                <form onSubmit={handleAddDeck} className="flex flex-col sm:flex-row gap-4">
-                    <input
-                        type="text"
-                        value={newDeckName}
-                        onChange={(e) => setNewDeckName(e.target.value)}
-                        placeholder={t("e.g., TOEIC Vocabulary")}
-                        className="flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!newDeckName.trim()}
-                        className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                        <i className="fas fa-plus mr-2"></i> {t("Create Deck")}
-                    </button>
+                <form onSubmit={handleAddDeck} className="flex flex-col gap-2">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <input
+                            type="text"
+                            value={newDeckName}
+                            onChange={(e) => {
+                                setNewDeckName(e.target.value);
+                                setDeckNameError(null); // Clear error on change
+                            }}
+                            placeholder={t("e.g., TOEIC Vocabulary")}
+                            className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
+                        />
+                        <button
+                            type="submit"
+                            className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
+                        >
+                            <i className="fas fa-plus mr-2"></i> {t("Create Deck")}
+                        </button>
+                    </div>
+                    {deckNameError && (
+                        <p className="text-red-500 text-sm pl-1">{deckNameError}</p>
+                    )}
                 </form>
             </div>
 

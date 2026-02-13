@@ -123,7 +123,10 @@ const translations: Record<string, string> = {
     "Undo": "Hoàn tác",
     "Delete Deck": "Xóa bộ thẻ",
     "Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.": "Bạn chắc chắn muốn xóa toàn bộ bộ thẻ này không? Hành động này không thể hoàn tác đâu nhé.",
-    "Deleted \"...\"": "Đã xóa \"...\""
+    "Deleted \"...\"": "Đã xóa \"...\"",
+    "Deck name cannot be empty.": "Tên bộ thẻ không được để trống.",
+    "Deck name contains invalid characters. Only letters, numbers, and spaces are allowed.": "Tên bộ thẻ chứa ký tự không hợp lệ. Chỉ được phép dùng chữ cái, số và khoảng trắng.",
+    "A deck with this name already exists.": "Tên bộ thẻ này đã tồn tại."
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
