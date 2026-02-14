@@ -1,7 +1,9 @@
 {
   "name": "memorydeck",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.1.0",
+  "description": "An interactive English learning application featuring flashcards, quizzes, matching games, and spelling challenges to help you master new vocabulary.",
+  "author": "Dao Hieu",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -26,7 +28,7 @@
       "allowToChangeInstallationDirectory": true,
       "perMachine": false
     },
-    "asar": false,
+    "asar": true,
     "directories": {
       "output": "dist_electron"
     },

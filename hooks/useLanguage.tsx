@@ -138,7 +138,12 @@ const translations: Record<string, string> = {
     "All Decks": "Tất cả bộ thẻ",
     "Select Save Location": "Chọn vị trí lưu",
     "Search decks...": "Tìm bộ thẻ...",
-    "Clear search": "Xóa tìm kiếm"
+    "Clear search": "Xóa tìm kiếm",
+    "What's New": "Có gì mới",
+    "What's New Content Placeholder": "Nội dung cập nhật sẽ hiển thị ở đây.",
+    "Whats New Introduction": "Các cập nhật chính:",
+    "Enhanced Import/Export UI": "Giao diện Xuất/Nhập được cải tiến",
+    "Integrated Search Functionality": "Chức năng tìm kiếm tích hợp"
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

@@ -235,6 +235,7 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
 
 const VersionDisplay: React.FC = () => {
     const { t } = useLanguage();
+    const { showModal } = useModal(); // Use the useModal hook
     const [version, setVersion] = useState('0.0.0');
 
     useEffect(() => {
@@ -247,9 +248,29 @@ const VersionDisplay: React.FC = () => {
         fetchVersion();
     }, []);
 
+    const handleVersionClick = () => {
+        showModal({
+            title: t("What's New"),
+            message: (
+                <div className="flex flex-col gap-2 text-sm text-[#1A2B22]/80 dark:text-white/80">
+                    <p className="font-semibold text-base mb-1">{t("Whats New Introduction")}</p>
+                    <ul className="list-disc list-inside space-y-1">
+                        <li>{t("Enhanced Import/Export UI")}</li>
+                        <li>{t("Integrated Search Functionality")}</li>
+                    </ul>
+                </div>
+            )
+        });
+    };
+
     return (
-        <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] mt-1 px-3 py-2 text-[10px] text-[#AFBD96] text-center">
-            {t("Version")} {version}
+        <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] mt-1 px-3 py-2 text-[10px] text-center">
+            <button
+                className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"
+                onClick={handleVersionClick}
+            >
+                {t("Version")} {version}
+            </button>
         </div>
     );
 };
