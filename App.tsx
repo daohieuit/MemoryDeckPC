@@ -18,6 +18,7 @@ import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squa
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
 import { useModal } from './hooks/useModal'; // Import useModal hook
 import { ArrowUpTrayIcon, ArrowDownTrayIcon } from './components/icons/Icons';
+import ExportModalContent from './components/ExportModalContent';
 
 const AboutPage: React.FC = () => {
     const { t } = useLanguage();
@@ -161,24 +162,7 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
         setIsSettingsOpen(false); // Close settings menu when opening export modal
         showModal({
             title: t("Export Options"),
-            message: (
-                <div className="flex flex-col gap-3 mt-4">
-                    <button
-                        onClick={() => { /* Export All logic here */ hideModal(); }}
-                        className="w-full text-left px-4 py-3 rounded-md text-[#1A2B22] dark:text-[#F1F5F9] bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-medium"
-                        title={t("Export the entire database.")}
-                    >
-                        {t("Export All")}
-                    </button>
-                    <button
-                        onClick={() => { /* Export Decks Only logic here */ hideModal(); }}
-                        className="w-full text-left px-4 py-3 rounded-md text-[#1A2B22] dark:text-[#F1F5F9] bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-medium"
-                        title={t("Choose one or more specific decks to export.")}
-                    >
-                        {t("Export Decks Only")}
-                    </button>
-                </div>
-            )
+            message: <ExportModalContent />
         });
     };
 

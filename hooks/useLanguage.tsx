@@ -132,7 +132,11 @@ const translations: Record<string, string> = {
     "Export All": "Xuất tất cả",
     "Export Decks Only": "Chỉ xuất bộ thẻ",
     "Export the entire database.": "Xuất toàn bộ cơ sở dữ liệu.",
-    "Choose one or more specific decks to export.": "Chọn một hoặc nhiều bộ thẻ cụ thể để xuất."
+    "Choose one or more specific decks to export.": "Chọn một hoặc nhiều bộ thẻ cụ thể để xuất.",
+    "Export Options": "Tùy chọn xuất",
+    "Select Decks to Export": "Chọn bộ thẻ để xuất",
+    "All Decks": "Tất cả bộ thẻ",
+    "Select Save Location": "Chọn vị trí lưu"
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
