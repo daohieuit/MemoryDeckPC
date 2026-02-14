@@ -16,6 +16,7 @@ import { GameMode } from './types';
 import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon, InformationCircleIcon } from './components/icons/Icons';
 
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
+import { ArrowUpTrayIcon, ArrowDownTrayIcon } from './components/icons/Icons';
 
 const AboutPage: React.FC = () => {
     const { t } = useLanguage();
@@ -199,6 +200,14 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
                                 </button>
                                 <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">{t("Application")}</div>
+                                <button onClick={() => { /* Export logic here */ setIsSettingsOpen(false); }} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                    <span>{t("Export Data")}</span>
+                                    <ArrowUpTrayIcon />
+                                </button>
+                                <button onClick={() => { /* Import logic here */ setIsSettingsOpen(false); }} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                    <span>{t("Import Data")}</span>
+                                    <ArrowDownTrayIcon />
+                                </button>
                                 <NavLink to="/about" onClick={() => setIsSettingsOpen(false)} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{t("About")}</span>
                                     <InformationCircleIcon />
