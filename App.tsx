@@ -16,6 +16,7 @@ import { GameMode } from './types';
 import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon, InformationCircleIcon } from './components/icons/Icons';
 
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
+import { useModal } from './hooks/useModal'; // Import useModal hook
 import { ArrowUpTrayIcon, ArrowDownTrayIcon } from './components/icons/Icons';
 
 const AboutPage: React.FC = () => {
@@ -143,6 +144,7 @@ const App: React.FC = () => {
 const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
     const { language, toggleLanguage, t } = useLanguage();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const { showModal, hideModal } = useModal(); // Use the useModal hook
     const settingsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -154,6 +156,31 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    const handleExportClick = () => {
+        setIsSettingsOpen(false); // Close settings menu when opening export modal
+        showModal({
+            title: t("Export Options"),
+            message: (
+                <div className="flex flex-col gap-3 mt-4">
+                    <button
+                        onClick={() => { /* Export All logic here */ hideModal(); }}
+                        className="w-full text-left px-4 py-3 rounded-md text-[#1A2B22] dark:text-[#F1F5F9] bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-medium"
+                        title={t("Export the entire database.")}
+                    >
+                        {t("Export All")}
+                    </button>
+                    <button
+                        onClick={() => { /* Export Decks Only logic here */ hideModal(); }}
+                        className="w-full text-left px-4 py-3 rounded-md text-[#1A2B22] dark:text-[#F1F5F9] bg-[#e8e5da] dark:bg-[#446843] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-medium"
+                        title={t("Choose one or more specific decks to export.")}
+                    >
+                        {t("Export Decks Only")}
+                    </button>
+                </div>
+            )
+        });
+    };
 
     return (
         <header className="bg-white/80 dark:bg-[#3A5A40]/50 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-[#EDE9DE] dark:border-[#3A5A40]/50">
@@ -200,7 +227,7 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
                                 </button>
                                 <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">{t("Application")}</div>
-                                <button onClick={() => { /* Export logic here */ setIsSettingsOpen(false); }} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                <button onClick={handleExportClick} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{t("Export Data")}</span>
                                     <ArrowUpTrayIcon />
                                 </button>

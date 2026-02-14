@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 
 export interface ModalOptions {
     title: string;
-    message: string;
+    message: string | React.ReactNode;
     confirmText?: string;
     onConfirm?: () => void;
     confirmVariant?: 'primary' | 'danger';

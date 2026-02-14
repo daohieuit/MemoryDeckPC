@@ -126,7 +126,13 @@ const translations: Record<string, string> = {
     "Deleted \"...\"": "Đã xóa \"...\"",
     "Deck name cannot be empty.": "Tên bộ thẻ không được để trống.",
     "Deck name contains invalid characters. Only letters, numbers, and spaces are allowed.": "Tên bộ thẻ chứa ký tự không hợp lệ. Chỉ được phép dùng chữ cái, số và khoảng trắng.",
-    "A deck with this name already exists.": "Tên bộ thẻ này đã tồn tại."
+    "A deck with this name already exists.": "Tên bộ thẻ này đã tồn tại.",
+    "Export Data": "Xuất dữ liệu",
+    "Import Data": "Nhập dữ liệu",
+    "Export All": "Xuất tất cả",
+    "Export Decks Only": "Chỉ xuất bộ thẻ",
+    "Export the entire database.": "Xuất toàn bộ cơ sở dữ liệu.",
+    "Choose one or more specific decks to export.": "Chọn một hoặc nhiều bộ thẻ cụ thể để xuất."
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
