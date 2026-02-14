@@ -63,7 +63,7 @@ const translations: Record<string, string> = {
     "Select a mode to begin your learning session for this deck.": "Chọn chế độ học phù hợp với bạn nha.",
     "Flashcard": "Flashcard",
     "Quiz": "Quiz",
-    "Matching": "Ghép cặp",
+    "Matching": "Ghép từ",
     "Spelling": "Chính tả",
     "Cards in this Deck": "Thẻ trong bộ này",
     "Add New": "Thêm thẻ",
@@ -123,7 +123,27 @@ const translations: Record<string, string> = {
     "Undo": "Hoàn tác",
     "Delete Deck": "Xóa bộ thẻ",
     "Are you sure you want to delete this entire deck and all its cards? This action cannot be undone.": "Bạn chắc chắn muốn xóa toàn bộ bộ thẻ này không? Hành động này không thể hoàn tác đâu nhé.",
-    "Deleted \"...\"": "Đã xóa \"...\""
+    "Deleted \"...\"": "Đã xóa \"...\"",
+    "Deck name cannot be empty.": "Tên bộ thẻ không được để trống.",
+    "Deck name contains invalid characters. Only letters, numbers, and spaces are allowed.": "Tên bộ thẻ chứa ký tự không hợp lệ. Chỉ được phép dùng chữ cái, số và khoảng trắng.",
+    "A deck with this name already exists.": "Tên bộ thẻ này đã tồn tại.",
+    "Export Data": "Xuất dữ liệu",
+    "Import Data": "Nhập dữ liệu",
+    "Export All": "Xuất tất cả",
+    "Export Decks Only": "Chỉ xuất bộ thẻ",
+    "Export the entire database.": "Xuất toàn bộ cơ sở dữ liệu.",
+    "Choose one or more specific decks to export.": "Chọn một hoặc nhiều bộ thẻ cụ thể để xuất.",
+    "Export Options": "Tùy chọn xuất",
+    "Select Decks to Export": "Chọn bộ thẻ để xuất",
+    "All Decks": "Tất cả bộ thẻ",
+    "Select Save Location": "Chọn vị trí lưu",
+    "Search decks...": "Tìm bộ thẻ...",
+    "Clear search": "Xóa tìm kiếm",
+    "What's New": "Có gì mới",
+    "What's New Content Placeholder": "Nội dung cập nhật sẽ hiển thị ở đây.",
+    "Whats New Introduction": "Các cập nhật chính:",
+    "Enhanced Import/Export UI": "Giao diện Xuất/Nhập được cải tiến",
+    "Integrated Search Functionality": "Chức năng tìm kiếm tích hợp"
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

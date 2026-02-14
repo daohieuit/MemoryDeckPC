@@ -296,7 +296,28 @@ export const WordListManager: React.FC = () => {
     const { decks, addDeck, deleteDeck, getTermsForDeck } = useWords();
     const { t } = useLanguage();
     const [newDeckName, setNewDeckName] = useState('');
+    const [deckNameError, setDeckNameError] = useState<string | null>(null);
     const { deckId: paramDeckId } = useParams<{ deckId: string }>();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleClearSearch = () => {
+        setSearchTerm('');
+    };
+
+    const validateDeckName = (name: string): string | null => {
+        if (!name.trim()) {
+            return t("Deck name cannot be empty.");
+        }
+        // Regex for alphanumeric and spaces
+        if (!/^[a-zA-Z0-9 ]*$/.test(name)) {
+            return t("Deck name contains invalid characters. Only letters, numbers, and spaces are allowed.");
+        }
+        // Uniqueness check
+        if (decks.some(deck => deck.name.toLowerCase() === name.trim().toLowerCase())) {
+            return t("A deck with this name already exists.");
+        }
+        return null; // No error
+    };
 
     const initialDeckId = paramDeckId ? parseInt(paramDeckId) : null;
 
@@ -316,14 +337,22 @@ export const WordListManager: React.FC = () => {
     // before using it to set state, which requires this handler to be `async`.
     const handleAddDeck = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newDeckName.trim()) {
-            const newId = await addDeck(newDeckName.trim());
-            setNewDeckName('');
-            // Automatically expand and enter edit mode for new decks
-            setExpandedDeckId(newId);
-            setEditModeDeckId(newId);
-            setNewlyCreatedDeckId(newId);
+        const trimmedName = newDeckName.trim();
+        const error = validateDeckName(trimmedName);
+
+        if (error) {
+            setDeckNameError(error);
+            return;
         }
+
+        setDeckNameError(null); // Clear previous errors
+
+        const newId = await addDeck(trimmedName);
+        setNewDeckName('');
+        // Automatically expand and enter edit mode for new decks
+        setExpandedDeckId(newId);
+        setEditModeDeckId(newId);
+        setNewlyCreatedDeckId(newId);
     };
 
     const toggleDeck = (id: number) => {
@@ -357,34 +386,69 @@ export const WordListManager: React.FC = () => {
         setEditModeDeckId(null);
     };
 
+    const filteredDecks = decks.filter(deck =>
+        deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold mb-6">{t("Manage My Decks")}</h1>
 
             <div className="bg-white dark:bg-[#344E41] p-6 rounded-lg shadow-lg border border-[#EDE9DE] dark:border-[#3A5A40] mb-8">
                 <h2 className="text-2xl font-bold mb-4">{t("Create New Deck")}</h2>
-                <form onSubmit={handleAddDeck} className="flex flex-col sm:flex-row gap-4">
-                    <input
-                        type="text"
-                        value={newDeckName}
-                        onChange={(e) => setNewDeckName(e.target.value)}
-                        placeholder={t("e.g., TOEIC Vocabulary")}
-                        className="flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border border-[#EDE9DE] dark:border-[#3A5A40] focus:outline-none focus:ring-2 focus:ring-[#56A652]"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!newDeckName.trim()}
-                        className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                        <i className="fas fa-plus mr-2"></i> {t("Create Deck")}
-                    </button>
+                <form onSubmit={handleAddDeck} className="flex flex-col gap-2">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <input
+                            type="text"
+                            value={newDeckName}
+                            onChange={(e) => {
+                                setNewDeckName(e.target.value);
+                                setDeckNameError(null); // Clear error on change
+                            }}
+                            placeholder={t("e.g., TOEIC Vocabulary")}
+                            className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
+                        />
+                        <button
+                            type="submit"
+                            className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
+                        >
+                            <i className="fas fa-plus mr-2"></i> {t("Create Deck")}
+                        </button>
+                    </div>
+                    {deckNameError && (
+                        <p className="text-red-500 text-sm pl-1">{deckNameError}</p>
+                    )}
                 </form>
             </div>
 
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">{t("Your Decks")}</h2>
+                <div className="relative w-full max-w-xs">
+                    <input
+                        type="text"
+                        placeholder={t("Search decks...")}
+                        className="w-full py-2 pl-8 pr-8 rounded-lg bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] text-[#121e18] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#56A652] text-sm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <i className="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-[#AFBD96] text-sm"></i>
+                    {searchTerm && (
+                        <button
+                            onClick={handleClearSearch}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#AFBD96] hover:text-[#EE4266] transition-colors"
+                            aria-label={t("Clear search")}
+                        >
+                            <i className="fas fa-times text-sm"></i>
+                        </button>
+                    )}
+                </div>
+            </div>
+            {filteredDecks.length === 0 && decks.length > 0 && (
+                <p className="text-[#AFBD96] text-center text-lg mt-8">{t("No decks found matching your search.")}</p>
+            )}
+            {decks.length === 0 && <p className="text-[#AFBD96]">{t("You don't have any decks yet.")}</p>}
             <div className="space-y-4">
-                <h2 className="text-2xl font-bold border-b border-[#EDE9DE] dark:border-[#3A5A40] pb-2">{t("Your Decks")}</h2>
-                {decks.length === 0 && <p className="text-[#AFBD96]">{t("You don't have any decks yet.")}</p>}
-                {decks.map(deck => (
+                {filteredDecks.map(deck => (
                     <div key={deck.id} className="bg-white dark:bg-[#344E41] rounded-lg border border-[#EDE9DE] dark:border-[#3A5A40] transition-all duration-300 shadow-md">
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>

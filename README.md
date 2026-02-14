@@ -59,6 +59,11 @@ To build the application and package it as a Windows executable:
    npm run electron:build
    ```
    *Note: This command builds the frontend and then packages it using electron-builder.*
+   **Important for Windows Users:** When running `npm run electron:build`, you might encounter errors related to symbolic link creation if not running with sufficient privileges. **Please run your terminal as an administrator** to avoid issues like "ERROR: Cannot create symbolic link : A required privilege is not held by the client."
+
+   **Best Practices:**
+   - Ensure your `package.json` includes `description` and `author` fields for better project metadata.
+   - It's recommended to enable ASAR packaging by setting `"asar": true` in your `package.json` build configuration for improved performance and security (it was previously `"asar": false`).
 
 ---
 

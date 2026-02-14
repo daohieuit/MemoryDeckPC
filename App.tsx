@@ -16,6 +16,9 @@ import { GameMode } from './types';
 import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon, InformationCircleIcon } from './components/icons/Icons';
 
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
+import { useModal } from './hooks/useModal'; // Import useModal hook
+import { ArrowUpTrayIcon, ArrowDownTrayIcon } from './components/icons/Icons';
+import ExportModalContent from './components/ExportModalContent';
 
 const AboutPage: React.FC = () => {
     const { t } = useLanguage();
@@ -142,6 +145,7 @@ const App: React.FC = () => {
 const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, toggleTheme }) => {
     const { language, toggleLanguage, t } = useLanguage();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const { showModal, hideModal } = useModal(); // Use the useModal hook
     const settingsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -153,6 +157,14 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    const handleExportClick = () => {
+        setIsSettingsOpen(false); // Close settings menu when opening export modal
+        showModal({
+            title: t("Export Options"),
+            message: <ExportModalContent />
+        });
+    };
 
     return (
         <header className="bg-white/80 dark:bg-[#3A5A40]/50 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-[#EDE9DE] dark:border-[#3A5A40]/50">
@@ -199,6 +211,14 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
                                 </button>
                                 <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] my-1"></div>
                                 <div className="px-3 py-2 text-xs font-semibold text-[#AFBD96] uppercase">{t("Application")}</div>
+                                <button onClick={handleExportClick} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                    <span>{t("Export Data")}</span>
+                                    <ArrowUpTrayIcon />
+                                </button>
+                                <button onClick={() => { /* Import logic here */ setIsSettingsOpen(false); }} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
+                                    <span>{t("Import Data")}</span>
+                                    <ArrowDownTrayIcon />
+                                </button>
                                 <NavLink to="/about" onClick={() => setIsSettingsOpen(false)} className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-[#1A2B22] dark:text-[#F1F5F9] hover:bg-[#e8e5da] dark:hover:bg-[#446843]">
                                     <span>{t("About")}</span>
                                     <InformationCircleIcon />
@@ -215,6 +235,7 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
 
 const VersionDisplay: React.FC = () => {
     const { t } = useLanguage();
+    const { showModal } = useModal(); // Use the useModal hook
     const [version, setVersion] = useState('0.0.0');
 
     useEffect(() => {
@@ -227,9 +248,29 @@ const VersionDisplay: React.FC = () => {
         fetchVersion();
     }, []);
 
+    const handleVersionClick = () => {
+        showModal({
+            title: t("What's New"),
+            message: (
+                <div className="flex flex-col gap-2 text-sm text-[#1A2B22]/80 dark:text-white/80">
+                    <p className="font-semibold text-base mb-1">{t("Whats New Introduction")}</p>
+                    <ul className="list-disc list-inside space-y-1">
+                        <li>{t("Enhanced Import/Export UI")}</li>
+                        <li>{t("Integrated Search Functionality")}</li>
+                    </ul>
+                </div>
+            )
+        });
+    };
+
     return (
-        <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] mt-1 px-3 py-2 text-[10px] text-[#AFBD96] text-center">
-            {t("Version")} {version}
+        <div className="border-t border-[#EDE9DE] dark:border-[#3A5A40] mt-1 px-3 py-2 text-[10px] text-center">
+            <button
+                className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"
+                onClick={handleVersionClick}
+            >
+                {t("Version")} {version}
+            </button>
         </div>
     );
 };
