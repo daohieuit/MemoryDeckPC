@@ -63,7 +63,7 @@ const translations: Record<string, string> = {
     "Select a mode to begin your learning session for this deck.": "Chọn chế độ học phù hợp với bạn nha.",
     "Flashcard": "Flashcard",
     "Quiz": "Quiz",
-    "Matching": "Ghép cặp",
+    "Matching": "Ghép từ",
     "Spelling": "Chính tả",
     "Cards in this Deck": "Thẻ trong bộ này",
     "Add New": "Thêm thẻ",
@@ -136,7 +136,9 @@ const translations: Record<string, string> = {
     "Export Options": "Tùy chọn xuất",
     "Select Decks to Export": "Chọn bộ thẻ để xuất",
     "All Decks": "Tất cả bộ thẻ",
-    "Select Save Location": "Chọn vị trí lưu"
+    "Select Save Location": "Chọn vị trí lưu",
+    "Search decks...": "Tìm bộ thẻ...",
+    "Clear search": "Xóa tìm kiếm"
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

@@ -298,6 +298,11 @@ export const WordListManager: React.FC = () => {
     const [newDeckName, setNewDeckName] = useState('');
     const [deckNameError, setDeckNameError] = useState<string | null>(null);
     const { deckId: paramDeckId } = useParams<{ deckId: string }>();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleClearSearch = () => {
+        setSearchTerm('');
+    };
 
     const validateDeckName = (name: string): string | null => {
         if (!name.trim()) {
@@ -381,6 +386,10 @@ export const WordListManager: React.FC = () => {
         setEditModeDeckId(null);
     };
 
+    const filteredDecks = decks.filter(deck =>
+        deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold mb-6">{t("Manage My Decks")}</h1>
@@ -412,10 +421,34 @@ export const WordListManager: React.FC = () => {
                 </form>
             </div>
 
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">{t("Your Decks")}</h2>
+                <div className="relative w-full max-w-xs">
+                    <input
+                        type="text"
+                        placeholder={t("Search decks...")}
+                        className="w-full py-2 pl-8 pr-8 rounded-lg bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] text-[#121e18] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#56A652] text-sm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <i className="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-[#AFBD96] text-sm"></i>
+                    {searchTerm && (
+                        <button
+                            onClick={handleClearSearch}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#AFBD96] hover:text-[#EE4266] transition-colors"
+                            aria-label={t("Clear search")}
+                        >
+                            <i className="fas fa-times text-sm"></i>
+                        </button>
+                    )}
+                </div>
+            </div>
+            {filteredDecks.length === 0 && decks.length > 0 && (
+                <p className="text-[#AFBD96] text-center text-lg mt-8">{t("No decks found matching your search.")}</p>
+            )}
+            {decks.length === 0 && <p className="text-[#AFBD96]">{t("You don't have any decks yet.")}</p>}
             <div className="space-y-4">
-                <h2 className="text-2xl font-bold border-b border-[#EDE9DE] dark:border-[#3A5A40] pb-2">{t("Your Decks")}</h2>
-                {decks.length === 0 && <p className="text-[#AFBD96]">{t("You don't have any decks yet.")}</p>}
-                {decks.map(deck => (
+                {filteredDecks.map(deck => (
                     <div key={deck.id} className="bg-white dark:bg-[#344E41] rounded-lg border border-[#EDE9DE] dark:border-[#3A5A40] transition-all duration-300 shadow-md">
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
