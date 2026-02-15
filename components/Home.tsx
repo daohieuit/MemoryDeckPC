@@ -73,7 +73,7 @@ export const Home: React.FC = () => {
         <div className="animate-fade-in">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-[#121e18] dark:text-white">{t("Welcome Back! 👋")}</h1>
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-[#121e18] dark:text-white mb-4">{t("Welcome Back! 👋")}</h1>
                     <p className="text-[#AFBD96] text-lg">{t("Choose a deck to start learning. 💪")}</p>
                 </div>
                 <div className="relative" ref={searchRef}>

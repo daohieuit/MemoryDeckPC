@@ -38,10 +38,10 @@ export const LearningModeSelector: React.FC<LearningModeSelectorProps> = ({ deck
 
     return (
         <div className="p-4">
-            <div className="flex flex-col items-center mb-4">
-                <p className="text-[#AFBD96] text-sm mb-1 text-center">{totalCards} {t("cards")}</p>
+            <div className="flex flex-col items-start mb-4">
+                <p className="text-[#AFBD96] text-sm mb-1">{totalCards} {t("cards")}</p>
                 {deck.created_at && (
-                    <p className="text-[#AFBD96] text-sm mb-4 text-center">
+                    <p className="text-[#AFBD96] text-sm mb-4">
                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                     </p>
                 )}
