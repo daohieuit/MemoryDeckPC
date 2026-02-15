@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
+import { useModal } from '../hooks/useModal';
 
 const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
@@ -11,6 +13,8 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { t } = useLanguage();
+    const navigate = useNavigate();
+    const { showConfirm } = useModal();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [gameTerms, setGameTerms] = useState<Term[]>([]);
@@ -84,13 +88,16 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     };
 
     if (isComplete) {
-        return (
-            <div className="text-center">
-                <h2 className="text-3xl font-bold text-[#0EAD69] mb-4">{t("Congratulations! 🎉")}</h2>
-                <p className="text-[#121e18]/80 dark:text-white/80 mb-6">{t("You've matched all the terms in")} <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
-                <button onClick={handleRestart} className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">{t("Play Again")}</button>
-            </div>
-        )
+        const timeTaken = formatTime(elapsedTime);
+        showConfirm({
+            title: t('Congratulations! 🎉'),
+            message: `${t("You've matched all the terms in")} ${timeTaken}.\n\n${t('Proceed to next learning mode?')}`,
+            confirmText: t('Yes'),
+            onConfirm: () => navigate(`/learn/${deckId}/spelling`),
+            cancelText: t('No'),
+            onCancel: () => navigate('/') // Go to dashboard if user says no
+        });
+        return null; // Don't render the completion message here
     }
 
     return (

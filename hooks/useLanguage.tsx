@@ -6,7 +6,7 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     toggleLanguage: () => void;
-    t: (key: string) => string;
+    t: (key: string, ...args: (string | number)[]) => string;
 }
 
 const translations: Record<string, string> = {
@@ -144,7 +144,12 @@ const translations: Record<string, string> = {
     "Whats New Introduction": "Các cập nhật chính:",
     "Enhanced Import/Export UI": "Giao diện Xuất/Nhập được cải tiến",
     "Integrated Search Functionality": "Chức năng tìm kiếm tích hợp",
-    "Created at": "Ngày tạo"
+    "Created at": "Ngày tạo",
+    "Proceed to next learning mode?": "Tiếp tục sang chế độ học tiếp theo?",
+    "Yes": "Đồng ý",
+    "No": "Không",
+    "Congratulations! You have completed this deck.": "Chúc mừng! Bạn đã hoàn thành bộ thẻ này.",
+    "Next question in {0}s...": "Câu hỏi tiếp theo trong {0}s..."
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -156,9 +161,20 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
         setLanguage(prev => prev === 'english' ? 'vietnamese' : 'english');
     };
 
-    const t = (key: string): string => {
-        if (language === 'english') return key;
-        return translations[key] || key;
+    const t = (key: string, ...args: (string | number)[]): string => {
+        let text = '';
+        if (language === 'english') {
+            text = key;
+        } else {
+            text = translations[key] || key;
+        }
+
+        // Replace placeholders {0}, {1}, etc.
+        args.forEach((arg, index) => {
+            text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), String(arg));
+        });
+
+        return text;
     };
 
     return (

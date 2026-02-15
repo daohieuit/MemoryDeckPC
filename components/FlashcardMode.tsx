@@ -1,12 +1,16 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
 import { Term, ProgressStatus } from '../types';
+import { useModal } from '../hooks/useModal';
 
 export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, getProgressForTerm, updateProgress } = useWords();
     const { t } = useLanguage();
+    const navigate = useNavigate();
+    const { showConfirm } = useModal();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -64,9 +68,14 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             if (currentIndex < sessionTerms.length - 1) {
                 setCurrentIndex(currentIndex + 1);
             } else {
-                // Reshuffle and start over
-                setSessionTerms(sortTermsForReview());
-                setCurrentIndex(0);
+                // Session completed for this mode
+                showConfirm({
+                    title: t("Session Completed!"),
+                    message: t("Proceed to next learning mode?"),
+                    confirmText: t("Yes"),
+                    onConfirm: () => navigate(`/learn/${deckId}/quiz`),
+                    cancelText: t("No")
+                });
             }
         }, 200);
     };
@@ -82,7 +91,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         return null;
     }
 
-    const progress = ((currentIndex + 1) / sessionTerms.length) * 100;
+    const progress = (currentIndex / sessionTerms.length) * 100;
 
     return (
         <div className="flex flex-col items-center">
@@ -90,7 +99,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                 <div className="bg-[#e8e5da] dark:bg-[#446843] rounded-full h-2.5">
                     <div className="bg-[#56A652] h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                 </div>
-                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex + 1} / {sessionTerms.length}</p>
+                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex} / {sessionTerms.length}</p>
             </div>
 
             <div style={{ perspective: '1000px' }} className="w-full max-w-2xl h-80 mb-6">

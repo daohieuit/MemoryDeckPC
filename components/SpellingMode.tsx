@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useModal } from '../hooks/useModal';
 import { useLanguage } from '../hooks/useLanguage';
@@ -14,6 +15,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { showAlert } = useModal();
     const { t } = useLanguage();
+    const navigate = useNavigate();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [sessionTerms, setSessionTerms] = useState<Term[]>([]);
@@ -70,12 +72,9 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                 } else {
                     showAlert({
                         title: t('Congratulations! 🎉'),
-                        message: t('You have completed all spelling terms!')
+                        message: t('You have completed this deck.')
                     });
-                    setCurrentIndex(0);
-                    setSessionTerms(shuffleArray(terms));
-                    setFeedback(null);
-                    setInputValue('');
+                    navigate('/'); // Navigate to dashboard after completing the deck
                 }
             }, 1500);
         } else {

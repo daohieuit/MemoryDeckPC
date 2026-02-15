@@ -143,7 +143,7 @@ export const Home: React.FC = () => {
                                 <p className="text-[#AFBD96] text-sm mb-2">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
                                     <p className="text-[#AFBD96] text-sm mb-2">
-                                        {t("Created at")}: {new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(deck.created_at))}
+                                        {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                                     </p>
                                 )}
                             </div>

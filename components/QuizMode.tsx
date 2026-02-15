@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useModal } from '../hooks/useModal';
 import { useLanguage } from '../hooks/useLanguage';
@@ -18,8 +19,9 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
-    const { showAlert } = useModal();
+    const { showAlert, showConfirm } = useModal();
     const { t } = useLanguage();
+    const navigate = useNavigate();
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -27,6 +29,10 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [score, setScore] = useState(0);
+
+    const [countdown, setCountdown] = useState(0);
+    const [showCountdown, setShowCountdown] = useState(false);
+    const countdownRef = useRef<NodeJS.Timeout | null>(null); // To hold the interval ID
 
     const shuffledTerms = useMemo(() => shuffleArray(terms), [terms]);
 
@@ -51,6 +57,49 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         }
     }, [currentQuestionIndex, shuffledTerms, generateOptions]);
 
+    const handleNext = useCallback(() => {
+        if (countdownRef.current) { // Clear any running countdown
+            clearInterval(countdownRef.current);
+        }
+        setShowCountdown(false);
+        setCountdown(0);
+        setSelectedAnswer(null);
+        setIsCorrect(null);
+        if (currentQuestionIndex < shuffledTerms.length - 1) {
+            setCurrentQuestionIndex(i => i + 1);
+        } else {
+            // End of quiz
+            showConfirm({
+                title: t('Quiz Finished!'),
+                message: `${t('Your score:')} ${score}/${shuffledTerms.length}\n\n${t('Proceed to next learning mode?')}`,
+                confirmText: t('Yes'),
+                onConfirm: () => navigate(`/learn/${deckId}/matching`),
+                cancelText: t('No'),
+                onCancel: () => navigate('/') // Go to dashboard if user says no
+            });
+        }
+    }, [currentQuestionIndex, shuffledTerms.length, score, deckId, navigate, showConfirm, t]);
+
+    // Countdown logic
+    useEffect(() => {
+        if (showCountdown && countdown > 0) {
+            countdownRef.current = setInterval(() => {
+                setCountdown(prev => prev - 1);
+            }, 1000);
+        } else if (showCountdown && countdown === 0) {
+            if (countdownRef.current) {
+                clearInterval(countdownRef.current);
+            }
+            handleNext(); // Auto-advance
+        }
+
+        return () => { // Cleanup on unmount or if dependencies change
+            if (countdownRef.current) {
+                clearInterval(countdownRef.current);
+            }
+        };
+    }, [showCountdown, countdown, handleNext]);
+
     const handleAnswer = (term: Term) => {
         if (selectedAnswer !== null) return;
 
@@ -61,25 +110,13 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         setIsCorrect(wasCorrect);
         if (wasCorrect) {
             setScore(s => s + 1);
+            setShowCountdown(true); // Start countdown
+            setCountdown(5); // 5 seconds
         }
         updateProgress(correctAnswer.id, {}); // Mark as reviewed
     };
 
-    const handleNext = () => {
-        setSelectedAnswer(null);
-        setIsCorrect(null);
-        if (currentQuestionIndex < shuffledTerms.length - 1) {
-            setCurrentQuestionIndex(i => i + 1);
-        } else {
-            // End of quiz
-            showAlert({
-                title: t('Quiz Finished!'),
-                message: `${t('Your score:')} ${score}/${shuffledTerms.length}`
-            });
-            setCurrentQuestionIndex(0);
-            setScore(0);
-        }
-    };
+
 
     if (terms.length < 4) {
         return <p className="text-center text-[#AFBD96]">{t("You need at least 4 terms in this deck to start a quiz.")}</p>;
@@ -125,12 +162,16 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         {isCorrect ? t('Correct! 🎯') : t('Incorrect!')}
                     </p>
                     {!isCorrect && <p className="mb-4 text-[#121e18]/80 dark:text-white/80">{t("The correct answer was:")} {currentTerm.definition}</p>}
-                    <button
-                        onClick={handleNext}
-                        className="bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors"
-                    >
-                        {currentQuestionIndex < shuffledTerms.length - 1 ? t('Next Question') : t('Finish Quiz')}
-                    </button>
+                    {showCountdown && isCorrect ? (
+                        <p className="text-[#AFBD96] mb-4">{t("Next question in {0}s...", countdown)}</p>
+                    ) : (
+                        <button
+                            onClick={handleNext}
+                            className="bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors"
+                        >
+                            {currentQuestionIndex < shuffledTerms.length - 1 ? t('Next Question') : t('Finish Quiz')}
+                        </button>
+                    )}
                 </div>
             )}
         </div>

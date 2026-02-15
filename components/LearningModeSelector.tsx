@@ -42,7 +42,7 @@ export const LearningModeSelector: React.FC<LearningModeSelectorProps> = ({ deck
                 <p className="text-[#AFBD96] text-sm mb-1 text-center">{totalCards} {t("cards")}</p>
                 {deck.created_at && (
                     <p className="text-[#AFBD96] text-sm mb-4 text-center">
-                        {t("Created at")}: {new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(deck.created_at))}
+                        {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                     </p>
                 )}
             </div>
