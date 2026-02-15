@@ -109,6 +109,11 @@ export const Home: React.FC = () => {
                             </button>
                             <div className="p-6">
                                 <h2 className="text-2xl font-bold text-[#121e18] dark:text-white mb-4">{deck.name}</h2>
+                                {deck.created_at && (
+                                    <p className="text-[#AFBD96] text-sm mb-2">
+                                        {t("Created at")}: {new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(deck.created_at))}
+                                    </p>
+                                )}
                                 <p className="text-[#AFBD96] mb-6 h-12">{t("Select a mode to begin your learning session for this deck.")}</p>
                                 <div className="grid grid-cols-2 gap-3">
                                     <ModeButton onClick={() => handleStart(deck.id, GameMode.Flashcard)} icon={<BookOpenIcon />} label={t("Flashcard")} />

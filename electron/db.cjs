@@ -91,7 +91,8 @@ function initDatabase() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS decks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL
+      name TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS terms (
@@ -111,6 +112,18 @@ function initDatabase() {
       FOREIGN KEY (term_id) REFERENCES terms (id) ON DELETE CASCADE
     );
   `);
+
+  // Add created_at column to decks table if it doesn't exist
+  const deckColumns = db.prepare("PRAGMA table_info(decks)").all().map(c => c.name);
+  if (!deckColumns.includes('created_at')) {
+    try {
+      db.exec('ALTER TABLE decks ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP');
+      // Update existing rows with a timestamp
+      db.exec('UPDATE decks SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+    } catch (e) {
+      console.log('Error adding created_at to decks table', e.message);
+    }
+  }
 
   return db;
 }

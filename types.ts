@@ -1,6 +1,7 @@
 export interface Deck {
     id: number;
     name: string;
+    created_at?: string;
 }
 
 export interface Term {

@@ -143,7 +143,8 @@ const translations: Record<string, string> = {
     "What's New Content Placeholder": "Nội dung cập nhật sẽ hiển thị ở đây.",
     "Whats New Introduction": "Các cập nhật chính:",
     "Enhanced Import/Export UI": "Giao diện Xuất/Nhập được cải tiến",
-    "Integrated Search Functionality": "Chức năng tìm kiếm tích hợp"
+    "Integrated Search Functionality": "Chức năng tìm kiếm tích hợp",
+    "Created at": "Ngày tạo"
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
