@@ -9,7 +9,8 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
     confirmText,
     onConfirm,
     confirmVariant = 'primary',
-    onDismiss
+    onDismiss,
+    headerButtons // Added headerButtons to destructuring
 }) => {
     const [isExiting, setIsExiting] = useState(false);
     const { t } = useLanguage();
@@ -67,15 +68,20 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-2"> {/* Flex container for title and close button */}
                         <h2 id="modal-title" className="text-2xl font-bold text-[#121e18] dark:text-white">{title}</h2>
-                        <button
-                            onClick={handleClose}
-                            className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"
-                            aria-label="Close modal"
-                        >
-                            <i className="fas fa-times"></i>
-                        </button>
+                        <div className="flex items-center gap-2"> {/* Group for header buttons and close button */}
+                            {headerButtons}
+                            <button
+                                onClick={handleClose}
+                                className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"
+                                aria-label="Close modal"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div className="mt-2 text-[#121e18]/80 dark:text-white/80">{message}</div>
+                    <div className="mt-2 text-[#121e18]/80 dark:text-white/80">
+                        {typeof message === 'string' ? <p>{message}</p> : message}
+                    </div>
                 </div>
                 {onConfirm && (
                     <div className="bg-[#EFF1F2] dark:bg-[#4D6A53]/50 px-6 py-4 flex justify-end gap-4 rounded-b-lg">

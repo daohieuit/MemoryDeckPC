@@ -7,6 +7,7 @@ export interface ModalOptions {
     confirmText?: string;
     onConfirm?: () => void;
     confirmVariant?: 'primary' | 'danger';
+    headerButtons?: React.ReactNode;
 }
 
 interface ModalContextType {
