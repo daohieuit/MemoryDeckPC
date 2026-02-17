@@ -128,7 +128,7 @@ export const Home: React.FC = () => {
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
                     {filteredDecks.map(deck => (
                         <div key={deck.id} onClick={() => openModeModal(deck)} className="bg-white dark:bg-[#344E41] rounded-xl shadow-lg border border-[#EDE9DE] dark:border-[#3A5A40] overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 relative cursor-pointer">
                             <button
@@ -139,7 +139,7 @@ export const Home: React.FC = () => {
                                 <PencilIcon className="w-5 h-5" />
                             </button>
                             <div className="p-6">
-                                <h2 className="text-2xl font-bold text-[#121e18] dark:text-white mb-4">{deck.name}</h2>
+                                <h2 className="text-2xl font-bold text-[#121e18] dark:text-white h-18 line-clamp-2 break-words text-start">{deck.name}</h2>
                                 <p className="text-[#AFBD96] text-sm mb-2">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
                                     <p className="text-[#AFBD96] text-sm mb-2">

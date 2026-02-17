@@ -398,17 +398,17 @@ export const WordListManager: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">{t("Create New Deck")}</h2>
                 <form onSubmit={handleAddDeck} className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="text"
-                            value={newDeckName}
-                            onChange={(e) => {
-                                setNewDeckName(e.target.value);
-                                setDeckNameError(null); // Clear error on change
-                            }}
-                            placeholder={t("e.g., TOEIC Vocabulary")}
-                            className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
-                        />
-                        <button
+                                                    <input
+                                                        type="text"
+                                                        value={newDeckName}
+                                                        onChange={(e) => {
+                                                            setNewDeckName(e.target.value);
+                                                            setDeckNameError(null); // Clear error on change
+                                                        }}
+                                                        placeholder={t("e.g., TOEIC Vocabulary")}
+                                                        maxLength={36}
+                                                        className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
+                                                    />                        <button
                             type="submit"
                             className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
                         >
