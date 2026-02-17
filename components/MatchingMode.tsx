@@ -10,6 +10,12 @@ const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
 };
 
+const formatTime = (totalMilliseconds: number) => {
+    const totalSeconds = Math.floor(totalMilliseconds / 1000);
+    const milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
+    return `${totalSeconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+};
+
 export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { t } = useLanguage();
@@ -26,6 +32,8 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
     const [startTime, setStartTime] = useState<number | null>(null);
     const [currentTime, setCurrentTime] = useState<number | null>(null);
+
+    const elapsedTime = startTime && currentTime ? currentTime - startTime : 0;
 
     const isComplete = useMemo(() => gameTerms.length > 0 && matchedPairs.length === gameTerms.length, [gameTerms.length, matchedPairs.length]);
 
@@ -75,29 +83,26 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         setupGame();
     }
 
+    useEffect(() => {
+        if (isComplete) {
+            const timeTaken = formatTime(elapsedTime);
+            showConfirm({
+                title: t('Congratulations! 🎉'),
+                message: `${t("You've matched all the terms in")} ${timeTaken}.\n\n${t('Proceed to next learning mode?')}`,
+                confirmText: t('Yes'),
+                onConfirm: () => navigate(`/learn/${deckId}/spelling`),
+                cancelText: t('No'),
+                onCancel: () => navigate('/') // Go to dashboard if user says no
+            });
+        }
+    }, [isComplete, elapsedTime, t, navigate, deckId, showConfirm]);
+
     if (terms.length < 2) {
         return <p className="text-center text-[#AFBD96]">{t("You need at least 2 terms in this deck to play the matching game.")}</p>;
     }
 
-    const elapsedTime = startTime && currentTime ? currentTime - startTime : 0;
-
-    const formatTime = (totalMilliseconds: number) => {
-        const totalSeconds = Math.floor(totalMilliseconds / 1000);
-        const milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
-        return `${totalSeconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
-    };
-
     if (isComplete) {
-        const timeTaken = formatTime(elapsedTime);
-        showConfirm({
-            title: t('Congratulations! 🎉'),
-            message: `${t("You've matched all the terms in")} ${timeTaken}.\n\n${t('Proceed to next learning mode?')}`,
-            confirmText: t('Yes'),
-            onConfirm: () => navigate(`/learn/${deckId}/spelling`),
-            cancelText: t('No'),
-            onCancel: () => navigate('/') // Go to dashboard if user says no
-        });
-        return null; // Don't render the completion message here
+        return null; // Don't render the game UI when complete
     }
 
     return (

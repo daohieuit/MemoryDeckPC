@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
-import { GameMode } from '../types';
+import { Deck, GameMode } from '../types';
 import { PencilIcon } from './icons/Icons';
 import { useModal } from '../hooks/useModal';
 import { LearningModeSelector } from './LearningModeSelector';

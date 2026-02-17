@@ -100,6 +100,8 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         };
     }, [showCountdown, countdown, handleNext]);
 
+
+
     const handleAnswer = (term: Term) => {
         if (selectedAnswer !== null) return;
 
@@ -162,9 +164,10 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                         {isCorrect ? t('Correct! 🎯') : t('Incorrect!')}
                     </p>
                     {!isCorrect && <p className="mb-4 text-[#121e18]/80 dark:text-white/80">{t("The correct answer was:")} {currentTerm.definition}</p>}
-                    {showCountdown && isCorrect ? (
+                    {isCorrect && showCountdown && (
                         <p className="text-[#AFBD96] mb-4">{t("Next question in {0}s...", countdown)}</p>
-                    ) : (
+                    )}
+                    {(isCorrect || !showCountdown) && ( // Show button if correct (and countdown is done) or incorrect
                         <button
                             onClick={handleNext}
                             className="bg-[#56A652] text-white font-bold py-3 px-10 rounded-lg hover:brightness-90 transition-colors"
