@@ -71,7 +71,12 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             // End of quiz
             showConfirm({
                 title: t('Quiz Finished!'),
-                message: `${t('Your score:')} ${score}/${shuffledTerms.length}\n\n${t('Proceed to next learning mode?')}`,
+                message: (
+                    <>
+                        <p>{t('Your score:')} {score}/{shuffledTerms.length}</p>
+                        <p className="mt-2">{t('Proceed to next learning mode?')}</p>
+                    </>
+                ),
                 confirmText: t('Yes'),
                 onConfirm: () => navigate(`/learn/${deckId}/matching`),
                 cancelText: t('No'),

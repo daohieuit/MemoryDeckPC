@@ -88,7 +88,12 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
             const timeTaken = formatTime(elapsedTime);
             showConfirm({
                 title: t('Congratulations! 🎉'),
-                message: `${t("You've matched all the terms in")} ${timeTaken}.\n\n${t('Proceed to next learning mode?')}`,
+                message: (
+                    <>
+                        <p>{t("You've matched all the terms in")} {timeTaken}.</p>
+                        <p className="mt-2">{t('Proceed to next learning mode?')}</p>
+                    </>
+                ),
                 confirmText: t('Yes'),
                 onConfirm: () => navigate(`/learn/${deckId}/spelling`),
                 cancelText: t('No'),

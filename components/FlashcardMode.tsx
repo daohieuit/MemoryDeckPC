@@ -71,7 +71,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                 // Session completed for this mode
                 showConfirm({
                     title: t("Session Completed!"),
-                    message: t("Proceed to next learning mode?"),
+                    message: (<p>{t("Proceed to next learning mode?")}</p>),
                     confirmText: t("Yes"),
                     onConfirm: () => navigate(`/learn/${deckId}/quiz`),
                     cancelText: t("No")
