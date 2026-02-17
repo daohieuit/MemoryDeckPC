@@ -5,6 +5,7 @@ import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 import { useModal } from '../hooks/useModal';
+import { useSessionResults } from '../hooks/useSessionResults'; // New import
 
 const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
@@ -21,6 +22,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { t } = useLanguage();
     const navigate = useNavigate();
     const { showConfirm } = useModal();
+    const { addResult } = useSessionResults(); // New line
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [gameTerms, setGameTerms] = useState<Term[]>([]);
@@ -86,6 +88,12 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     useEffect(() => {
         if (isComplete) {
             const timeTaken = formatTime(elapsedTime);
+            // Add matching session results
+            addResult('matching', {
+                timeTakenMs: elapsedTime,
+                matchedPairs: matchedPairs.length,
+                totalPairs: gameTerms.length
+            });
             showConfirm({
                 title: t('Congratulations! 🎉'),
                 message: (
@@ -100,7 +108,7 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                 onCancel: () => navigate('/') // Go to dashboard if user says no
             });
         }
-    }, [isComplete, elapsedTime, t, navigate, deckId, showConfirm]);
+    }, [isComplete, elapsedTime, t, navigate, deckId, showConfirm, addResult, matchedPairs.length, gameTerms.length]);
 
     if (terms.length < 2) {
         return <p className="text-center text-[#AFBD96]">{t("You need at least 2 terms in this deck to play the matching game.")}</p>;

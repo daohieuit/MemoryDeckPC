@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useModal } from '../hooks/useModal';
 import { useLanguage } from '../hooks/useLanguage';
+import { useSessionResults } from '../hooks/useSessionResults'; // New import
 import { Term } from '../types';
 
 // Utility to shuffle an array
@@ -22,6 +23,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { showAlert, showConfirm } = useModal();
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const { addResult } = useSessionResults(); // New line
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -29,6 +31,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [score, setScore] = useState(0);
+    const [isQuizCompleted, setIsQuizCompleted] = useState(false);
 
     const [countdown, setCountdown] = useState(0);
     const [showCountdown, setShowCountdown] = useState(false);
@@ -52,7 +55,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     }, [currentQuestionIndex, shuffledTerms]);
 
     useEffect(() => {
-        if (shuffledTerms.length > 0) {
+        if (shuffledTerms.length > 0 && currentQuestionIndex < shuffledTerms.length) { // Add boundary check
             generateOptions();
         }
     }, [currentQuestionIndex, shuffledTerms, generateOptions]);
@@ -68,20 +71,28 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         if (currentQuestionIndex < shuffledTerms.length - 1) {
             setCurrentQuestionIndex(i => i + 1);
         } else {
-            // End of quiz
-            showConfirm({
-                title: t('Quiz Finished!'),
-                message: (
-                    <>
-                        <p>{t('Your score:')} {score}/{shuffledTerms.length}</p>
-                        <p className="mt-2">{t('Proceed to next learning mode?')}</p>
-                    </>
-                ),
-                confirmText: t('Yes'),
-                onConfirm: () => navigate(`/learn/${deckId}/matching`),
-                cancelText: t('No'),
-                onCancel: () => navigate('/') // Go to dashboard if user says no
+            // End of quiz. Mark quiz as completed.
+            setIsQuizCompleted(true); // Signal completion
+            // Add quiz session results
+            addResult('quiz', {
+                score: score,
+                totalQuestions: shuffledTerms.length
             });
+            setTimeout(() => {
+                showConfirm({
+                    title: t('Quiz Finished!'),
+                    message: (
+                        <>
+                            <p>{t('Your score:')} {score}/{shuffledTerms.length}</p>
+                            <p className="mt-2">{t('Proceed to next learning mode?')}</p>
+                        </>
+                    ),
+                    confirmText: t('Yes'),
+                    onConfirm: () => setTimeout(() => navigate(`/learn/${deckId}/matching`), 300),
+                    cancelText: t('No'),
+                    onCancel: () => navigate('/') // Go to dashboard if user says no
+                });
+            }, 200); // Change delay to 200ms
         }
     }, [currentQuestionIndex, shuffledTerms.length, score, deckId, navigate, showConfirm, t]);
 
@@ -134,7 +145,7 @@ export const QuizMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
     return (
         <div className="max-w-3xl mx-auto text-center">
-            <p className="text-[#AFBD96] mb-2">{t("Question")} {currentQuestionIndex + 1} {t("of")} {shuffledTerms.length}</p>
+            <p className="text-[#AFBD96] mb-2">{t("Question")} {isQuizCompleted ? shuffledTerms.length : currentQuestionIndex + 1} {t("of")} {shuffledTerms.length}</p>
             <h2 className="text-4xl font-bold mb-4">{currentTerm.term}</h2>
             <p className="text-xl text-[#121e18]/80 dark:text-white/80 mb-8">{t("Which of the following best defines this term?")}</p>
 
