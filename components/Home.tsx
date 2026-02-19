@@ -14,6 +14,7 @@ export const Home: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false); // New state for search bar
     const searchRef = useRef<HTMLDivElement>(null); // Ref for click-outside
+    const [streakValue, setStreakValue] = useState(5); // Simulate a streak for UI purposes
 
     const { showModal, hideModal } = useModal();
 
@@ -76,15 +77,28 @@ export const Home: React.FC = () => {
                     <h1 className="text-4xl md:text-5xl font-extrabold text-[#121e18] dark:text-white mb-4">{t("Welcome Back! 👋")}</h1>
                     <p className="text-[#AFBD96] text-lg">{t("Choose a deck to start learning. 💪")}</p>
                 </div>
-                <div className="relative" ref={searchRef}>
+                <div className="flex items-center relative" ref={searchRef}>
+                    {/* Streak Icon and Counter */}
+                    <button
+                        className="flex items-center p-2 rounded-full transition-colors mr-2 group cursor-pointer"
+                        aria-label={t("Streak")} // Placeholder label
+                        onClick={() => { /* No logic required yet */ }}
+                    >
+                        <i className={`fas fa-fire text-xl transition-all duration-200 ease-in-out group-hover:scale-110 ${streakValue > 0 ? 'text-red-500 group-hover:drop-shadow-red-glow' : 'text-gray-500'}`}></i>
+                        <span className={`ml-1 text-lg font-bold transition-all duration-200 ease-in-out group-hover:scale-110 ${streakValue > 0 ? 'text-red-500' : 'text-gray-500'}`}>{streakValue}</span>
+                    </button>
+
                     {!isSearchExpanded ? (
-                        <button
-                            onClick={() => setIsSearchExpanded(true)}
-                            className="p-2 rounded-full text-[#AFBD96] hover:text-[#56A652] transition-colors"
-                            aria-label={t("Search decks...")}
-                        >
-                            <i className="fas fa-search text-xl"></i>
-                        </button>
+                        <>
+                            {/* Search Button */}
+                            <button
+                                onClick={() => setIsSearchExpanded(true)}
+                                className="p-2 rounded-full text-[#AFBD96] hover:text-[#56A652] transition-colors"
+                                aria-label={t("Search decks...")}
+                            >
+                                <i className="fas fa-search text-xl"></i>
+                            </button>
+                        </>
                     ) : (
                         <>
                             <input
@@ -144,6 +158,12 @@ export const Home: React.FC = () => {
                                 {deck.created_at && (
                                     <p className="text-[#AFBD96] text-sm mb-2">
                                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
+                                    </p>
+                                )}
+                                {/* Placeholder for Last Studied Date - UI Only */}
+                                {true && ( // Always render for UI only
+                                    <p className="text-[#AFBD96] text-sm mb-2">
+                                        {t("Last studied")}: {new Date('2024-02-17T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
                                     </p>
                                 )}
                             </div>
