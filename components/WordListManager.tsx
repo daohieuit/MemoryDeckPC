@@ -5,6 +5,8 @@ import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 import { useParams } from 'react-router-dom';
 
+import { PencilIcon } from './icons/Icons';
+
 const formatIPA = (ipa: string): string => {
     const content = ipa.trim().replace(/^\/|\/$/g, '').trim();
     return content ? `/${content}/` : '';
@@ -455,7 +457,12 @@ export const WordListManager: React.FC = () => {
                     <div key={deck.id} className="bg-white dark:bg-[#344E41] rounded-lg border border-[#EDE9DE] dark:border-[#3A5A40] transition-all duration-300 shadow-md">
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
-                                <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
+                                <div className="flex items-center group">
+                                    <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
+                                    {editModeDeckId === deck.id && (
+                                        <PencilIcon className="w-2.5 h-2.5 ml-2 text-gray-400 group-hover:text-white transition-all duration-300" />
+                                    )}
+                                </div>
                                 <p className="text-[#AFBD96] text-sm mb-0">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
                                     <p className="text-[#AFBD96] text-sm">
