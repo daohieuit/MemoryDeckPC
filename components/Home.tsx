@@ -84,8 +84,8 @@ export const Home: React.FC = () => {
                         aria-label={t("Streak")} // Placeholder label
                         onClick={() => { /* No logic required yet */ }}
                     >
-                        <i className={`fas fa-fire text-xl transition-all duration-200 ease-in-out group-hover:scale-110 ${streakValue > 0 ? 'text-red-500 group-hover:drop-shadow-red-glow' : 'text-gray-500'}`}></i>
-                        <span className={`ml-1 text-lg font-bold transition-all duration-200 ease-in-out group-hover:scale-110 ${streakValue > 0 ? 'text-red-500' : 'text-gray-500'}`}>{streakValue}</span>
+                        <i className={`fas fa-fire text-xl transition-all duration-200 ease-in-out ${streakValue > 0 ? 'text-red-500 group-hover:text-red-600 group-hover:drop-shadow-vibrant-red-glow' : 'text-gray-500'}`}></i>
+                        <span className={`ml-1 text-lg transition-all duration-200 ease-in-out ${streakValue > 0 ? 'font-bold text-red-500 group-hover:text-red-600' : 'text-gray-500 group-hover:text-black group-hover:font-bold'}`}>{streakValue}</span>
                     </button>
 
                     {!isSearchExpanded ? (
@@ -100,7 +100,7 @@ export const Home: React.FC = () => {
                             </button>
                         </>
                     ) : (
-                        <>
+                        <div className="relative">
                             <input
                                 type="text"
                                 placeholder={t("Search decks...")}
@@ -119,7 +119,7 @@ export const Home: React.FC = () => {
                                     <i className="fas fa-times text-lg"></i>
                                 </button>
                             )}
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
@@ -152,11 +152,11 @@ export const Home: React.FC = () => {
                             >
                                 <PencilIcon className="w-5 h-5" />
                             </button>
-                            <div className="p-6">
+                            <div className="px-6 pt-6 pb-2">
                                 <h2 className="text-2xl font-bold text-[#121e18] dark:text-white h-18 line-clamp-2 break-words text-start">{deck.name}</h2>
                                 <p className="text-[#AFBD96] text-sm mb-2">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
-                                    <p className="text-[#AFBD96] text-sm mb-2">
+                                    <p className="text-[#AFBD96] text-sm mb-0">
                                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                                     </p>
                                 )}

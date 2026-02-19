@@ -422,7 +422,10 @@ export const WordListManager: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">{t("Your Decks")}</h2>
+                <div className="flex items-baseline">
+                    <h2 className="text-2xl font-bold">{t("My Decks")}</h2>
+                    <span className="text-[#AFBD96] text-lg ml-2">({decks.length} {t("decks")})</span>
+                </div>
                 <div className="relative w-full max-w-xs">
                     <input
                         type="text"
@@ -453,18 +456,18 @@ export const WordListManager: React.FC = () => {
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
                                 <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
+                                <p className="text-[#AFBD96] text-sm mb-0">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
-                                    <p className="text-[#AFBD96] text-sm mt-1">
+                                    <p className="text-[#AFBD96] text-sm">
                                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                                     </p>
                                 )}
                                 {/* Placeholder for Last Studied Date - UI Only */}
                                 {true && ( // Always render for UI only
-                                    <p className="text-[#AFBD96] text-sm mt-1">
+                                    <p className="text-[#AFBD96] text-sm">
                                         {t("Last studied")}: {new Date('2024-02-18T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
                                     </p>
                                 )}
-                                <p className="text-[#AFBD96]">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">

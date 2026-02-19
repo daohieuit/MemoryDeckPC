@@ -87,7 +87,6 @@ const translations: Record<string, string> = {
     "Create New Deck": "Tạo bộ thẻ mới",
     "e.g., TOEIC Vocabulary": "Ví dụ: Từ vựng TOEIC",
     "Create Deck": "Tạo",
-    "Your Decks": "Bộ thẻ của bạn",
     "You don't have any decks yet.": "Bạn chưa có bộ thẻ nào hết.",
     "cards": "thẻ",
     "Edit": "Chỉnh sửa",

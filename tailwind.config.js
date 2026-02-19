@@ -12,7 +12,7 @@ export default {
   theme: {
     extend: {
       dropShadow: {
-        'red-glow': '0 0 8px rgba(239, 68, 68, 0.7)', // subtle red glow
+        'vibrant-red-glow': '0 0 5px #FF4D4D', // Strong red glow
       }
     },
   },

@@ -41,13 +41,13 @@ export const LearningModeSelector: React.FC<LearningModeSelectorProps> = ({ deck
             <div className="flex flex-col items-start mb-4">
                 <p className="text-[#AFBD96] text-sm mb-1">{totalCards} {t("cards")}</p>
                 {deck.created_at && (
-                    <p className="text-[#AFBD96] text-sm mb-4">
+                    <p className="text-[#AFBD96] text-sm mb-0">
                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                     </p>
                 )}
                 {/* Placeholder for Last Studied Date - UI Only */}
                 {true && ( // Always render for UI only
-                    <p className="text-[#AFBD96] text-sm mb-4">
+                    <p className="text-[#AFBD96] text-sm mb-2">
                         {t("Last studied")}: {new Date('2024-02-17T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
                     </p>
                 )}
