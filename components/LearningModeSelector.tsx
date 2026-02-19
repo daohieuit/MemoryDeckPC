@@ -45,6 +45,12 @@ export const LearningModeSelector: React.FC<LearningModeSelectorProps> = ({ deck
                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                     </p>
                 )}
+                {/* Placeholder for Last Studied Date - UI Only */}
+                {true && ( // Always render for UI only
+                    <p className="text-[#AFBD96] text-sm mb-4">
+                        {t("Last studied")}: {new Date('2024-02-17T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
+                    </p>
+                )}
             </div>
             <div className="grid grid-cols-2 gap-3">
                 <ModeButton onClick={() => onModeSelect(GameMode.Flashcard)} icon={<BookOpenIcon />} label={t("Flashcard")} />

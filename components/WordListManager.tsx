@@ -458,6 +458,12 @@ export const WordListManager: React.FC = () => {
                                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                                     </p>
                                 )}
+                                {/* Placeholder for Last Studied Date - UI Only */}
+                                {true && ( // Always render for UI only
+                                    <p className="text-[#AFBD96] text-sm mt-1">
+                                        {t("Last studied")}: {new Date('2024-02-18T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
+                                    </p>
+                                )}
                                 <p className="text-[#AFBD96]">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                             </div>
                             <div className="flex items-center gap-4">
