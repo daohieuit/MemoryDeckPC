@@ -149,8 +149,7 @@ export const Home: React.FC = () => {
                     className="flex items-center p-2 rounded-lg text-[#AFBD96] hover:text-[#56A652] transition-colors bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] shadow-sm"
                     aria-label={t("Sort decks")}
                 >
-                    <i className="fas fa-sort-amount-down text-xl mr-2"></i>
-                    <span>{t("Sort by")}: {selectedSortOption}</span>
+                    <i className="fas fa-sort-amount-down text-xl"></i>
                 </button>
 
                 {isSortDropdownOpen && (
@@ -159,7 +158,7 @@ export const Home: React.FC = () => {
                             <button
                                 key={option.key}
                                 onClick={() => handleSortOptionClick(option.label)}
-                                className="block w-full text-left px-4 py-2 text-[#121e18] dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#446843] transition-colors"
+                                className={`block w-full text-left px-4 py-2 text-[#121e18] dark:text-white transition-colors ${selectedSortOption === option.label ? 'bg-[#E0E0E0] dark:bg-[#446843] font-bold' : 'hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
                             >
                                 {option.label}
                             </button>
