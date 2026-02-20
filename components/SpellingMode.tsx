@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useModal } from '../hooks/useModal';
+import { useSessionResults } from '../hooks/useSessionResults'; // New import
 import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 
@@ -14,12 +16,15 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { showAlert } = useModal();
     const { t } = useLanguage();
+    const navigate = useNavigate();
+    const { addResult } = useSessionResults(); // New line
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [sessionTerms, setSessionTerms] = useState<Term[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [inputValue, setInputValue] = useState('');
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
+    const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // New state
 
     const speak = (text: string) => {
         if ('speechSynthesis' in window) {
@@ -62,20 +67,20 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         if (inputValue.trim().toLowerCase() === currentTerm.term.toLowerCase()) {
             setFeedback('correct');
             updateProgress(currentTerm.id, {});
+            setCorrectAnswersCount(prev => prev + 1); // Increment correct answers count
             setTimeout(() => {
                 if (currentIndex < sessionTerms.length - 1) {
                     setCurrentIndex(i => i + 1);
                     setInputValue('');
                     setFeedback(null);
                 } else {
-                    showAlert({
-                        title: t('Congratulations! 🎉'),
-                        message: t('You have completed all spelling terms!')
+                    // Spelling session completed
+                    const finalCorrectAnswers = correctAnswersCount + 1; // Calculate final count before calling addResult
+                    addResult('spelling', {
+                        correctAnswers: finalCorrectAnswers,
+                        totalTerms: sessionTerms.length
                     });
-                    setCurrentIndex(0);
-                    setSessionTerms(shuffleArray(terms));
-                    setFeedback(null);
-                    setInputValue('');
+                    navigate(`/learn/${deckId}/summary`); // Navigate to summary after completing the deck
                 }
             }, 1500);
         } else {
@@ -91,7 +96,7 @@ export const SpellingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const currentTerm = sessionTerms[currentIndex];
     if (!currentTerm) return null;
 
-    let inputBorderColor = 'border-[#EDE9DE] dark:border-[#3A5A40] focus:border-[#56A652]';
+    let inputBorderColor = 'border-[#EDE9DE] dark:border-[#3A5A40]';
     if (feedback === 'correct') inputBorderColor = 'border-[#0EAD69]';
     if (feedback === 'incorrect') inputBorderColor = 'border-[#EE4266] animate-shake';
 

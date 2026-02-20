@@ -10,7 +10,11 @@ export default {
     "./src/**/*.html",
   ],
   theme: {
-    extend: {},
+    extend: {
+      dropShadow: {
+        'vibrant-red-glow': '0 0 5px #FF4D4D', // Strong red glow
+      }
+    },
   },
   plugins: [],
 }

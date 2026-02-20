@@ -1,16 +1,28 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
+import { useModal } from '../hooks/useModal';
+import { useSessionResults } from '../hooks/useSessionResults'; // New import
 
 const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
 };
 
+const formatTime = (totalMilliseconds: number) => {
+    const totalSeconds = Math.floor(totalMilliseconds / 1000);
+    const milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
+    return `${totalSeconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+};
+
 export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, updateProgress } = useWords();
     const { t } = useLanguage();
+    const navigate = useNavigate();
+    const { showConfirm } = useModal();
+    const { addResult } = useSessionResults(); // New line
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [gameTerms, setGameTerms] = useState<Term[]>([]);
@@ -22,6 +34,8 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
 
     const [startTime, setStartTime] = useState<number | null>(null);
     const [currentTime, setCurrentTime] = useState<number | null>(null);
+
+    const elapsedTime = startTime && currentTime ? currentTime - startTime : 0;
 
     const isComplete = useMemo(() => gameTerms.length > 0 && matchedPairs.length === gameTerms.length, [gameTerms.length, matchedPairs.length]);
 
@@ -71,26 +85,37 @@ export const MatchingMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         setupGame();
     }
 
+    useEffect(() => {
+        if (isComplete) {
+            const timeTaken = formatTime(elapsedTime);
+            // Add matching session results
+            addResult('matching', {
+                timeTakenMs: elapsedTime,
+                matchedPairs: matchedPairs.length,
+                totalPairs: gameTerms.length
+            });
+            showConfirm({
+                title: t('Congratulations! 🎉'),
+                message: (
+                    <>
+                        <p>{t("You've matched all the terms in")} {timeTaken}.</p>
+                        <p className="mt-2">{t('Proceed to next learning mode?')}</p>
+                    </>
+                ),
+                confirmText: t('Yes'),
+                onConfirm: () => navigate(`/learn/${deckId}/spelling`),
+                cancelText: t('No'),
+                onCancel: () => navigate('/') // Go to dashboard if user says no
+            });
+        }
+    }, [isComplete, elapsedTime, t, navigate, deckId, showConfirm, addResult, matchedPairs.length, gameTerms.length]);
+
     if (terms.length < 2) {
         return <p className="text-center text-[#AFBD96]">{t("You need at least 2 terms in this deck to play the matching game.")}</p>;
     }
 
-    const elapsedTime = startTime && currentTime ? currentTime - startTime : 0;
-
-    const formatTime = (totalMilliseconds: number) => {
-        const totalSeconds = Math.floor(totalMilliseconds / 1000);
-        const milliseconds = Math.floor((totalMilliseconds % 1000) / 10);
-        return `${totalSeconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
-    };
-
     if (isComplete) {
-        return (
-            <div className="text-center">
-                <h2 className="text-3xl font-bold text-[#0EAD69] mb-4">{t("Congratulations! 🎉")}</h2>
-                <p className="text-[#121e18]/80 dark:text-white/80 mb-6">{t("You've matched all the terms in")} <span className="font-bold text-lg">{formatTime(elapsedTime)}</span>.</p>
-                <button onClick={handleRestart} className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-lg hover:brightness-90 transition-colors">{t("Play Again")}</button>
-            </div>
-        )
+        return null; // Don't render the game UI when complete
     }
 
     return (

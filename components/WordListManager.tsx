@@ -5,6 +5,8 @@ import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 import { useParams } from 'react-router-dom';
 
+import { PencilIcon, XMarkIcon } from './icons/Icons';
+
 const formatIPA = (ipa: string): string => {
     const content = ipa.trim().replace(/^\/|\/$/g, '').trim();
     return content ? `/${content}/` : '';
@@ -323,6 +325,8 @@ export const WordListManager: React.FC = () => {
 
     const [expandedDeckId, setExpandedDeckId] = useState<number | null>(initialDeckId);
     const [editModeDeckId, setEditModeDeckId] = useState<number | null>(initialDeckId);
+    const [isRenamingDeckNameId, setIsRenamingDeckNameId] = useState<number | null>(null);
+    const [editedDeckName, setEditedDeckName] = useState<string>(''); // New state for edited deck name
     const [newlyCreatedDeckId, setNewlyCreatedDeckId] = useState<number | null>(null);
 
     // If a deckId is provided in the URL, ensure it's expanded and in edit mode
@@ -361,6 +365,7 @@ export const WordListManager: React.FC = () => {
         if (isCurrentlyExpanded) {
             setExpandedDeckId(null);
             setEditModeDeckId(null); // Also exit edit mode when collapsing
+            setIsRenamingDeckNameId(null); // Also exit name edit mode
         } else {
             setExpandedDeckId(id);
         }
@@ -373,6 +378,7 @@ export const WordListManager: React.FC = () => {
             const isEditingThisDeck = prevId === deckId;
             if (isEditingThisDeck) {
                 // Was editing, now we cancel
+                setIsRenamingDeckNameId(null); // Clear renaming state
                 return null;
             } else {
                 // Was not editing, now we start
@@ -398,17 +404,17 @@ export const WordListManager: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">{t("Create New Deck")}</h2>
                 <form onSubmit={handleAddDeck} className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="text"
-                            value={newDeckName}
-                            onChange={(e) => {
-                                setNewDeckName(e.target.value);
-                                setDeckNameError(null); // Clear error on change
-                            }}
-                            placeholder={t("e.g., TOEIC Vocabulary")}
-                            className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
-                        />
-                        <button
+                                                    <input
+                                                        type="text"
+                                                        value={newDeckName}
+                                                        onChange={(e) => {
+                                                            setNewDeckName(e.target.value);
+                                                            setDeckNameError(null); // Clear error on change
+                                                        }}
+                                                        placeholder={t("e.g., TOEIC Vocabulary")}
+                                                        maxLength={36}
+                                                        className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
+                                                    />                        <button
                             type="submit"
                             className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
                         >
@@ -422,7 +428,10 @@ export const WordListManager: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">{t("Your Decks")}</h2>
+                <div className="flex items-baseline">
+                    <h2 className="text-2xl font-bold">{t("My Decks")}</h2>
+                    <span className="text-[#AFBD96] text-lg ml-2">({decks.length} {t("decks")})</span>
+                </div>
                 <div className="relative w-full max-w-xs">
                     <input
                         type="text"
@@ -452,23 +461,83 @@ export const WordListManager: React.FC = () => {
                     <div key={deck.id} className="bg-white dark:bg-[#344E41] rounded-lg border border-[#EDE9DE] dark:border-[#3A5A40] transition-all duration-300 shadow-md">
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
-                                <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
-                                <p className="text-[#AFBD96]">{getTermsForDeck(deck.id).length} {t("cards")}</p>
+                                <div className="flex items-center group">
+                                    {isRenamingDeckNameId === deck.id ? (
+                                        <input
+                                            type="text"
+                                            value={editedDeckName}
+                                            onChange={(e) => setEditedDeckName(e.target.value)}
+                                            onClick={(e) => e.stopPropagation()} // Prevent parent deck expansion on input click
+                                            className="text-xl font-bold bg-transparent border-b border-[#56A652] dark:border-white focus:outline-none focus:ring-0 text-[#1A2B22] dark:text-white transition-colors duration-200"
+                                        />
+                                    ) : (
+                                        <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
+                                    )}
+                                    {editModeDeckId === deck.id && ( // Only render button if in general edit mode
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent parent accordion from toggling
+                                                const willEnterRenameMode = isRenamingDeckNameId !== deck.id;
+                                                setIsRenamingDeckNameId(willEnterRenameMode ? deck.id : null);
+                                                if (willEnterRenameMode) {
+                                                    setEditedDeckName(deck.name); // Initialize with current name when entering rename mode
+                                                }
+                                            }}
+                                            className="ml-2 text-gray-400 group-hover:text-[#1A2B22] dark:group-hover:text-white transition-all duration-300"
+                                            aria-label={isRenamingDeckNameId === deck.id ? t("Cancel renaming deck") : t("Rename deck")}
+                                        >
+                                            {isRenamingDeckNameId === deck.id ? ( // If actively renaming, show X
+                                                <XMarkIcon className="w-5 h-5" />
+                                            ) : ( // Otherwise, show Pencil (indicating available for rename)
+                                                <PencilIcon className="w-5 h-5" />
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-[#AFBD96] text-sm mb-0">{getTermsForDeck(deck.id).length} {t("cards")}</p>
+                                {deck.created_at && (
+                                    <p className="text-[#AFBD96] text-sm">
+                                        {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
+                                    </p>
+                                )}
+                                {/* Placeholder for Last Studied Date - UI Only */}
+                                {true && ( // Always render for UI only
+                                    <p className="text-[#AFBD96] text-sm">
+                                        {t("Last studied")}: {new Date('2024-02-18T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
+                                    </p>
+                                )}
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={(e) => handleToggleEdit(e, deck.id)}
-                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${editModeDeckId === deck.id
-                                            ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
-                                            : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
-                                            }`}
-                                    >
-                                        {editModeDeckId === deck.id
-                                            ? <><i className="fas fa-times mr-2"></i>{t("Cancel")}</>
-                                            : <><i className="fas fa-edit mr-2"></i>{t("Edit")}</>
-                                        }
-                                    </button>
+                                    {editModeDeckId === deck.id ? ( // Show Save and Cancel when in edit mode
+                                        <>
+                                            {/* Save Button */}
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); /* No save logic yet */ }}
+                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#56A652] text-white hover:brightness-90"
+                                                aria-label={t("Save changes")}
+                                            >
+                                                <i className="fas fa-save mr-2"></i> {t("Save")}
+                                            </button>
+
+                                            {/* Cancel Button */}
+                                            <button
+                                                onClick={(e) => handleToggleEdit(e, deck.id)} // This exits edit mode
+                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#AFBD96] text-[#1A2B22] hover:bg-[#CDC6AE] dark:bg-[#344E41] dark:text-white dark:hover:bg-[#3A5A40]"
+                                                aria-label={t("Cancel editing")}
+                                            >
+                                                <i className="fas fa-times mr-2"></i> {t("Cancel")}
+                                            </button>
+                                        </>
+                                    ) : ( // Show only Edit button when not in edit mode
+                                        <button
+                                            onClick={(e) => handleToggleEdit(e, deck.id)}
+                                            className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40"
+                                            aria-label={t("Edit deck")}
+                                        >
+                                            <i className="fas fa-edit mr-2"></i> {t("Edit")}
+                                        </button>
+                                    )}
                                     <button
                                         onClick={(e) => { e.stopPropagation(); deleteDeck(deck.id); }}
                                         className="text-[#EE4266] hover:brightness-90 bg-[#EE4266]/20 dark:bg-[#EE4266]/30 hover:bg-[#EE4266]/30 dark:hover:bg-[#EE4266]/40 px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center"

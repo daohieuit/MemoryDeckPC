@@ -4,11 +4,13 @@ import { HashRouter, Routes, Route, NavLink, useParams, useNavigate } from 'reac
 import { WordProvider, useWords } from './hooks/useWords';
 import { ToastProvider } from './hooks/useToast';
 import { ModalProvider } from './hooks/useModal';
+import { SessionResultsProvider } from './hooks/useSessionResults';
 import { Home } from './components/Home';
 import { FlashcardMode } from './components/FlashcardMode';
 import { QuizMode } from './components/QuizMode';
 import { MatchingMode } from './components/MatchingMode';
 import { SpellingMode } from './components/SpellingMode';
+import { DeckCompletedSummary } from './components/DeckCompletedSummary'; // New import
 import { WordListManager } from './components/WordListManager';
 import { ToastContainer } from './components/Toast';
 import { ModalContainer } from './components/Modal';
@@ -113,21 +115,24 @@ const AppContent: React.FC = () => {
         <ToastProvider>
             <ModalProvider>
                 <WordProvider>
-                    <HashRouter>
-                        <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
-                            <Header theme={theme} toggleTheme={toggleTheme} />
-                            <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
-                                <Routes>
-                                    <Route path="/" element={<Home />} />
-                                    <Route path="/manage-words/:deckId?" element={<WordListManager />} />
-                                    <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
-                                    <Route path="/about" element={<AboutPage />} />
-                                </Routes>
-                            </main>
-                            <ToastContainer />
-                            <ModalContainer />
-                        </div>
-                    </HashRouter>
+                    <SessionResultsProvider>
+                        <HashRouter>
+                            <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
+                                <Header theme={theme} toggleTheme={toggleTheme} />
+                                <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+                                    <Routes>
+                                        <Route path="/" element={<Home />} />
+                                        <Route path="/manage-words/:deckId?" element={<WordListManager />} />
+                                        <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
+                                        <Route path="/learn/:deckId/summary" element={<DeckCompletedSummary />} /> {/* New Route */}
+                                        <Route path="/about" element={<AboutPage />} />
+                                    </Routes>
+                                </main>
+                                <ToastContainer />
+                                <ModalContainer />
+                            </div>
+                        </HashRouter>
+                    </SessionResultsProvider>
                 </WordProvider>
             </ModalProvider>
         </ToastProvider>

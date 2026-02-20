@@ -1,17 +1,29 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
 import { Term, ProgressStatus } from '../types';
+import { useModal } from '../hooks/useModal';
+import { useSessionResults } from '../hooks/useSessionResults'; // New import
 
 export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
     const { getTermsForDeck, getProgressForTerm, updateProgress } = useWords();
     const { t } = useLanguage();
+    const navigate = useNavigate();
+    const { showConfirm } = useModal();
+    const { addResult } = useSessionResults(); // New line
     const terms = useMemo(() => getTermsForDeck(deckId), [deckId, getTermsForDeck]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [sessionTerms, setSessionTerms] = useState<Term[]>([]);
+    const [isSessionCompleted, setIsSessionCompleted] = useState(false);
+
+    // New state for difficulty counts
+    const [easyCount, setEasyCount] = useState(0);
+    const [goodCount, setGoodCount] = useState(0);
+    const [hardCount, setHardCount] = useState(0);
 
     const sortTermsForReview = useCallback(() => {
         return [...terms].sort((a, b) => {
@@ -48,27 +60,66 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         switch (difficulty) {
             case 'easy':
                 newStatus = ProgressStatus.Mastered;
+                setEasyCount(prev => prev + 1); // Increment easy count
                 break;
             case 'good':
                 newStatus = newStatus === ProgressStatus.New ? ProgressStatus.Learning : newStatus;
+                setGoodCount(prev => prev + 1); // Increment good count
                 break;
             case 'hard':
                 newStatus = ProgressStatus.Learning;
+                setHardCount(prev => prev + 1); // Increment hard count
                 break;
         }
 
         updateProgress(term.id, { status: newStatus });
 
         setIsFlipped(false);
-        setTimeout(() => {
-            if (currentIndex < sessionTerms.length - 1) {
+        // Check if this is the last term
+        if (currentIndex < sessionTerms.length - 1) {
+            setTimeout(() => {
                 setCurrentIndex(currentIndex + 1);
-            } else {
-                // Reshuffle and start over
-                setSessionTerms(sortTermsForReview());
-                setCurrentIndex(0);
+            }, 200);
+        } else {
+            // This is the last term. Mark session as completed.
+            setIsSessionCompleted(true); // Signal completion
+
+            // Calculate the final counts including the current card's selection
+            let finalEasyCount = easyCount;
+            let finalGoodCount = goodCount;
+            let finalHardCount = hardCount;
+
+            switch (difficulty) { // Use the 'difficulty' from the current handleNext call
+                case 'easy':
+                    finalEasyCount++;
+                    break;
+                case 'good':
+                    finalGoodCount++;
+                    break;
+                case 'hard':
+                    finalHardCount++;
+                    break;
             }
-        }, 200);
+
+            // Add flashcard session results with the final calculated counts
+            addResult('flashcard', {
+                totalCards: sessionTerms.length,
+                easy: finalEasyCount,
+                good: finalGoodCount,
+                hard: finalHardCount,
+            });
+            setTimeout(() => {
+                // Then, after a slight delay, show the confirmation modal
+                showConfirm({
+                    title: t("Session Completed!"),
+                    message: (<p>{t("Proceed to next learning mode?")}</p>),
+                    confirmText: t("Yes"),
+                    onConfirm: () => setTimeout(() => navigate(`/learn/${deckId}/quiz`), 300),
+                    cancelText: t("No"),
+                    onCancel: () => navigate('/') // Go to dashboard if user says no
+                });
+            }, 200); // Change delay to 200ms
+        }
     };
 
     if (terms.length === 0) {
@@ -82,7 +133,8 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
         return null;
     }
 
-    const progress = ((currentIndex + 1) / sessionTerms.length) * 100;
+    const displayCurrentIndex = isSessionCompleted ? sessionTerms.length : currentIndex;
+    const progress = (displayCurrentIndex / sessionTerms.length) * 100;
 
     return (
         <div className="flex flex-col items-center">
@@ -90,7 +142,7 @@ export const FlashcardMode: React.FC<{ deckId: number }> = ({ deckId }) => {
                 <div className="bg-[#e8e5da] dark:bg-[#446843] rounded-full h-2.5">
                     <div className="bg-[#56A652] h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                 </div>
-                <p className="text-center mt-2 text-[#AFBD96]">{currentIndex + 1} / {sessionTerms.length}</p>
+                <p className="text-center mt-2 text-[#AFBD96]">{displayCurrentIndex} / {sessionTerms.length}</p>
             </div>
 
             <div style={{ perspective: '1000px' }} className="w-full max-w-2xl h-80 mb-6">

@@ -1,7 +1,7 @@
 {
   "name": "memorydeck",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An interactive English learning application featuring flashcards, quizzes, matching games, and spelling challenges to help you master new vocabulary.",
   "author": "Dao Hieu",
   "type": "module",
