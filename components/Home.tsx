@@ -176,7 +176,7 @@ export const Home: React.FC = () => {
                             <button
                                 key={option.key}
                                 onClick={() => handleSortOptionClick(option)}
-                                className={`flex items-center justify-between w-full text-left px-4 py-2 text-[#121e18] dark:text-white transition-colors ${currentSortKey === option.key ? 'bg-[#E0E0E0] dark:bg-[#446843] font-bold' : 'hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
+                                className={`flex items-center justify-between w-full text-left px-4 py-2 transition-colors ${currentSortKey === option.key ? 'bg-[#56A652] text-white font-bold' : 'text-[#121e18] dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
                             >
                                 {option.label}
                                 {currentSortKey === option.key && (
