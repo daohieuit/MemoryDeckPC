@@ -171,7 +171,7 @@ export const Home: React.FC = () => {
                 </button>
 
                 {isSortDropdownOpen && (
-                    <div className="absolute z-10 top-full left-0 mt-2 w-48 bg-white dark:bg-[#344E41] rounded-lg shadow-xl border border-[#EDE9DE] dark:border-[#3A5A40] overflow-hidden backdrop-blur-md">
+                    <div className="absolute z-10 top-full left-0 mt-2 w-48 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-xl border border-[#EDE9DE] dark:border-[#3A5A40] overflow-hidden backdrop-blur-md">
                         {SORT_OPTIONS.map((option) => (
                             <button
                                 key={option.key}
