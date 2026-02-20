@@ -16,8 +16,8 @@ export const Home: React.FC = () => {
     const searchRef = useRef<HTMLDivElement>(null); // Ref for click-outside
     const [streakValue, setStreakValue] = useState(5); // Simulate a streak for UI purposes
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-    const [currentSortKey, setCurrentSortKey] = useState('last-studied'); // Default sort key
-    const [currentSortDirection, setCurrentSortDirection] = useState('desc'); // Default direction for 'last-studied' (Newest first)
+    const [currentSortKey, setCurrentSortKey] = useState('name'); // Default sort key
+    const [currentSortDirection, setCurrentSortDirection] = useState('asc'); // Default direction for all (Ascending)
     const sortDropdownRef = useRef<HTMLDivElement>(null);
 
     const { showModal, hideModal } = useModal();
@@ -26,20 +26,17 @@ export const Home: React.FC = () => {
         {
             key: 'name',
             label: t('Name'),
-            displayIcon: { asc: 'fas fa-arrow-down-a-z', desc: 'fas fa-arrow-up-a-z' },
-            defaultDirection: 'asc', // Default to A-Z
+            defaultDirection: 'asc',
         },
         {
             key: 'last-studied',
             label: t('Last Studied'),
-            displayIcon: { base: 'fas fa-clock-rotate-left', asc: 'fas fa-arrow-up', desc: 'fas fa-arrow-down' },
-            defaultDirection: 'desc', // Default to Newest first
+            defaultDirection: 'asc',
         },
         {
             key: 'created-at',
             label: t('Created At'),
-            displayIcon: { base: 'fas fa-calendar-alt', asc: 'fas fa-arrow-up', desc: 'fas fa-arrow-down' },
-            defaultDirection: 'desc', // Default to Newest first
+            defaultDirection: 'asc',
         },
     ];
 
@@ -48,13 +45,12 @@ export const Home: React.FC = () => {
             // If the same option is clicked, toggle direction
             setCurrentSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
         } else {
-            // If a new option is clicked, set it as current and use its default direction
+            // If a new option is clicked, set it as current and use its default direction (always 'asc' now)
             setCurrentSortKey(option.key);
-            setCurrentSortDirection(option.defaultDirection);
+            setCurrentSortDirection('asc');
         }
         setIsSortDropdownOpen(false);
     };
-
     const handleStart = (deckId: number, mode: GameMode) => {
         navigate(`/learn/${deckId}/${mode}`);
     };
@@ -171,22 +167,7 @@ export const Home: React.FC = () => {
                     className="flex items-center p-1.5 rounded-full text-[#AFBD96] hover:text-[#56A652] transition-colors hover:bg-gray-200 dark:hover:bg-[#446843]"
                     aria-label={t("Sort decks")}
                 >
-                    {(() => {
-                        const option = SORT_OPTIONS.find(opt => opt.key === currentSortKey);
-                        if (!option) return null;
-
-                        if (option.key === 'name') {
-                            return <i className={`${currentSortDirection === 'asc' ? option.displayIcon.asc : option.displayIcon.desc} text-xl mr-2`}></i>;
-                        } else {
-                            return (
-                                <>
-                                    <i className={`${option.displayIcon.base} text-xl mr-1`}></i>
-                                    <i className={`${currentSortDirection === 'asc' ? option.displayIcon.asc : option.displayIcon.desc} text-lg`}></i>
-                                </>
-                            );
-                        }
-                    })()}
-                    <span>{SORT_OPTIONS.find(opt => opt.key === currentSortKey)?.label}</span>
+                    <i className="fas fa-sort text-xl"></i>
                 </button>
 
                 {isSortDropdownOpen && (
@@ -195,27 +176,12 @@ export const Home: React.FC = () => {
                             <button
                                 key={option.key}
                                 onClick={() => handleSortOptionClick(option)}
-                                className={`flex items-center w-full text-left px-4 py-2 text-[#121e18] dark:text-white transition-colors ${currentSortKey === option.key ? 'bg-[#E0E0E0] dark:bg-[#446843] font-bold' : 'hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
+                                className={`flex items-center justify-between w-full text-left px-4 py-2 text-[#121e18] dark:text-white transition-colors ${currentSortKey === option.key ? 'bg-[#E0E0E0] dark:bg-[#446843] font-bold' : 'hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
                             >
-                                {(() => {
-                                    if (option.key === 'name') {
-                                        const iconClass = (currentSortKey === option.key && currentSortDirection === 'desc')
-                                            ? option.displayIcon.desc
-                                            : option.displayIcon.asc;
-                                        return <i className={`${iconClass} text-xl mr-2`}></i>;
-                                    } else {
-                                        const arrowIconClass = (currentSortKey === option.key && currentSortDirection === 'asc')
-                                            ? option.displayIcon.asc
-                                            : option.displayIcon.desc;
-                                        return (
-                                            <>
-                                                <i className={`${option.displayIcon.base} text-xl mr-1`}></i>
-                                                <i className={`${arrowIconClass} text-lg`}></i>
-                                            </>
-                                        );
-                                    }
-                                })()}
                                 {option.label}
+                                {currentSortKey === option.key && (
+                                    <i className={`${currentSortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'} text-lg ml-2`}></i>
+                                )}
                             </button>
                         ))}
                     </div>
