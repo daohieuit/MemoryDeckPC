@@ -167,7 +167,7 @@ export const Home: React.FC = () => {
                     className="flex items-center p-1.5 rounded-full text-[#AFBD96] hover:text-[#56A652] transition-colors hover:bg-gray-200 dark:hover:bg-[#446843]"
                     aria-label={t("Sort decks")}
                 >
-                    <i className="fas fa-bars-staggered text-xl"></i>
+                    <i className="fa-solid fa-arrow-down-wide-short text-xl"></i>
                 </button>
 
                 {isSortDropdownOpen && (
