@@ -326,6 +326,7 @@ export const WordListManager: React.FC = () => {
     const [expandedDeckId, setExpandedDeckId] = useState<number | null>(initialDeckId);
     const [editModeDeckId, setEditModeDeckId] = useState<number | null>(initialDeckId);
     const [isRenamingDeckNameId, setIsRenamingDeckNameId] = useState<number | null>(null);
+    const [editedDeckName, setEditedDeckName] = useState<string>(''); // New state for edited deck name
     const [newlyCreatedDeckId, setNewlyCreatedDeckId] = useState<number | null>(null);
 
     // If a deckId is provided in the URL, ensure it's expanded and in edit mode
@@ -460,12 +461,26 @@ export const WordListManager: React.FC = () => {
                         <div className="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-[#446843]/50" onClick={() => toggleDeck(deck.id)}>
                             <div>
                                 <div className="flex items-center group">
-                                    <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
+                                    {isRenamingDeckNameId === deck.id ? (
+                                        <input
+                                            type="text"
+                                            value={editedDeckName}
+                                            onChange={(e) => setEditedDeckName(e.target.value)}
+                                            onClick={(e) => e.stopPropagation()} // Prevent parent deck expansion on input click
+                                            className="text-xl font-bold bg-transparent border-b border-[#56A652] dark:border-[#78C257] focus:outline-none focus:border-b-2 text-[#1A2B22] dark:text-white"
+                                        />
+                                    ) : (
+                                        <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
+                                    )}
                                     {editModeDeckId === deck.id && ( // Only render button if in general edit mode
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation(); // Prevent parent accordion from toggling
-                                                setIsRenamingDeckNameId(prevId => prevId === deck.id ? null : deck.id);
+                                                const willEnterRenameMode = isRenamingDeckNameId !== deck.id;
+                                                setIsRenamingDeckNameId(willEnterRenameMode ? deck.id : null);
+                                                if (willEnterRenameMode) {
+                                                    setEditedDeckName(deck.name); // Initialize with current name when entering rename mode
+                                                }
                                             }}
                                             className="ml-2 text-gray-400 group-hover:text-white transition-all duration-300"
                                             aria-label={isRenamingDeckNameId === deck.id ? t("Cancel renaming deck") : t("Rename deck")}
