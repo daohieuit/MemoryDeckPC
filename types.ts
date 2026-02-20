@@ -2,6 +2,7 @@ export interface Deck {
     id: number;
     name: string;
     created_at?: string;
+    last_studied?: string;
 }
 
 export interface Term {

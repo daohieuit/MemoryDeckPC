@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionResults, ModeResults } from '../hooks/useSessionResults';
 import { useLanguage } from '../hooks/useLanguage';
@@ -10,10 +10,17 @@ export const DeckCompletedSummary: React.FC = () => {
     const { results, clearResults } = useSessionResults();
     const { t } = useLanguage();
     const navigate = useNavigate();
-    const { decks } = useWords();
+    const { decks, updateDeckLastStudied } = useWords();
 
     const deck = decks.find(d => d.id.toString() === deckId);
     const deckName = deck ? deck.name : t('Unknown Deck');
+
+    // Record the "last studied" timestamp at the moment the deck is completed
+    useEffect(() => {
+        if (deckId) {
+            updateDeckLastStudied(parseInt(deckId));
+        }
+    }, [deckId, updateDeckLastStudied]);
 
     const handleReturnToDashboard = () => {
         clearResults();

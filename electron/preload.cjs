@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         getDecks: () => ipcRenderer.invoke('db:getDecks'),
         addDeck: (name) => ipcRenderer.invoke('db:addDeck', name),
         renameDeck: (id, name) => ipcRenderer.invoke('db:renameDeck', id, name),
+        updateDeckLastStudied: (id, lastStudied) => ipcRenderer.invoke('db:updateDeckLastStudied', id, lastStudied),
         deleteDeck: (id) => ipcRenderer.invoke('db:deleteDeck', id),
 
         getTerms: () => ipcRenderer.invoke('db:getTerms'),

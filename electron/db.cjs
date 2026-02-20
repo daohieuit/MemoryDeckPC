@@ -125,32 +125,43 @@ function initDatabase() {
     }
   }
 
+  // Add last_studied column to decks table if it doesn't exist
+  const deckColumnsAfter = db.prepare("PRAGMA table_info(decks)").all().map(c => c.name);
+  if (!deckColumnsAfter.includes('last_studied')) {
+    try {
+      db.exec('ALTER TABLE decks ADD COLUMN last_studied TEXT DEFAULT NULL');
+    } catch (e) {
+      console.log('Error adding last_studied to decks table', e.message);
+    }
+  }
+
   return db;
 }
 
-const dbOps = {
+const createDbOps = (dbInstance) => ({
   // Decks (formerly decks/Categories)
-  getDecks: () => db.prepare('SELECT * FROM decks').all(),
-  addDeck: (name) => db.prepare('INSERT INTO decks (name) VALUES (?)').run(name).lastInsertRowid,
-  renameDeck: (id, name) => db.prepare('UPDATE decks SET name = ? WHERE id = ?').run(name, id),
-  deleteDeck: (id) => db.prepare('DELETE FROM decks WHERE id = ?').run(id),
+  getDecks: () => dbInstance.prepare('SELECT * FROM decks').all(),
+  addDeck: (name) => dbInstance.prepare('INSERT INTO decks (name) VALUES (?)').run(name).lastInsertRowid,
+  renameDeck: (id, name) => dbInstance.prepare('UPDATE decks SET name = ? WHERE id = ?').run(name, id),
+  updateDeckLastStudied: (id, lastStudied) => dbInstance.prepare('UPDATE decks SET last_studied = ? WHERE id = ?').run(lastStudied, id),
+  deleteDeck: (id) => dbInstance.prepare('DELETE FROM decks WHERE id = ?').run(id),
 
   // Terms (formerly Words)
-  getTerms: () => db.prepare('SELECT * FROM terms').all(),
+  getTerms: () => dbInstance.prepare('SELECT * FROM terms').all(),
   addTerm: (deckId, term, definition, ipa, functionValue) =>
-    db.prepare('INSERT INTO terms (deck_id, term, definition, ipa, function) VALUES (?, ?, ?, ?, ?)').run(deckId, term, definition, ipa, functionValue).lastInsertRowid,
+    dbInstance.prepare('INSERT INTO terms (deck_id, term, definition, ipa, function) VALUES (?, ?, ?, ?, ?)').run(deckId, term, definition, ipa, functionValue).lastInsertRowid,
   updateTerm: (termId, termData) => {
     const { term, definition, ipa, function: functionValue } = termData;
-    return db.prepare('UPDATE terms SET term = COALESCE(?, term), definition = COALESCE(?, definition), ipa = COALESCE(?, ipa), function = COALESCE(?, function) WHERE id = ?')
+    return dbInstance.prepare('UPDATE terms SET term = COALESCE(?, term), definition = COALESCE(?, definition), ipa = COALESCE(?, ipa), function = COALESCE(?, function) WHERE id = ?')
       .run(term, definition, ipa, functionValue, termId);
   },
-  deleteTerm: (termId) => db.prepare('DELETE FROM terms WHERE id = ?').run(termId),
-  deleteTermsByDeck: (deckId) => db.prepare('DELETE FROM terms WHERE deck_id = ?').run(deckId),
+  deleteTerm: (termId) => dbInstance.prepare('DELETE FROM terms WHERE id = ?').run(termId),
+  deleteTermsByDeck: (deckId) => dbInstance.prepare('DELETE FROM terms WHERE deck_id = ?').run(deckId),
 
   // Progress
-  getAllProgress: () => db.prepare('SELECT * FROM progress').all(),
+  getAllProgress: () => dbInstance.prepare('SELECT * FROM progress').all(),
   updateProgress: (termId, status, lastReviewed) => {
-    return db.prepare(`
+    return dbInstance.prepare(`
       INSERT INTO progress (term_id, status, last_reviewed)
       VALUES (?, ?, ?)
       ON CONFLICT(term_id) DO UPDATE SET
@@ -158,6 +169,6 @@ const dbOps = {
         last_reviewed = excluded.last_reviewed
     `).run(termId, status, lastReviewed);
   }
-};
+});
 
-module.exports = { initDatabase, dbOps };
+module.exports = { initDatabase, createDbOps };

@@ -1,15 +1,17 @@
 const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
-const { initDatabase, dbOps } = require('./db.cjs');
+const { initDatabase, createDbOps } = require('./db.cjs');
 
 const isDev = process.env.NODE_ENV === 'development';
 let db;
+let dbOps;
 
 function registerIpcHandlers() {
     ipcMain.handle('app:getVersion', () => app.getVersion());
     ipcMain.handle('db:getDecks', () => dbOps.getDecks());
     ipcMain.handle('db:addDeck', (_, name) => dbOps.addDeck(name));
     ipcMain.handle('db:renameDeck', (_, id, name) => dbOps.renameDeck(id, name));
+    ipcMain.handle('db:updateDeckLastStudied', (_, id, lastStudied) => dbOps.updateDeckLastStudied(id, lastStudied));
     ipcMain.handle('db:deleteDeck', (_, id) => dbOps.deleteDeck(id));
 
     ipcMain.handle('db:getTerms', () => dbOps.getTerms());
@@ -24,6 +26,7 @@ function registerIpcHandlers() {
 
 function createWindow() {
     db = initDatabase();
+    dbOps = createDbOps(db);
     registerIpcHandlers();
     const mainWindow = new BrowserWindow({
         width: 1200,

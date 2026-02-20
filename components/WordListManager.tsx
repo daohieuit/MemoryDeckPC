@@ -579,12 +579,24 @@ export const WordListManager: React.FC = () => {
                                         {t("Created at")}: {new Date(deck.created_at).toLocaleDateString('en-GB')}
                                     </p>
                                 )}
-                                {/* Placeholder for Last Studied Date - UI Only */}
-                                {true && ( // Always render for UI only
-                                    <p className="text-[#AFBD96] text-sm">
-                                        {t("Last studied")}: {new Date('2024-02-18T10:00:00Z').toLocaleDateString('en-GB')} {/* Example date */}
-                                    </p>
-                                )}
+                                {/* Last Studied Date - Real Data */}
+                                <p className="text-[#AFBD96] text-sm">
+                                    {t("Last studied")}: {(() => {
+                                        if (!deck.last_studied) return t("Not studied yet");
+                                        const now = new Date();
+                                        const studied = new Date(deck.last_studied);
+                                        const diffMs = now.getTime() - studied.getTime();
+                                        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                                        if (diffMinutes < 5) return t("Just now");
+                                        if (diffMinutes < 60) return t("{0} minutes ago", diffMinutes);
+                                        if (diffHours < 24) return diffHours === 1 ? t("1 hour ago") : t("{0} hours ago", diffHours);
+                                        if (diffDays <= 3) return diffDays === 1 ? t("1 day ago") : t("{0} days ago", diffDays);
+                                        return studied.toLocaleDateString('en-GB');
+                                    })()}
+                                </p>
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">

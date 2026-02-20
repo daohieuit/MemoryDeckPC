@@ -13,6 +13,7 @@ declare global {
                 getDecks: () => Promise<Deck[]>;
                 addDeck: (name: string) => Promise<number>;
                 renameDeck: (id: number, name: string) => Promise<void>;
+                updateDeckLastStudied: (id: number, lastStudied: string) => Promise<void>;
                 deleteDeck: (id: number) => Promise<void>;
                 getTerms: () => Promise<Term[]>;
                 addTerm: (deckId: number, term: string, definition: string, ipa: string, functionValue: string) => Promise<number>;
@@ -45,6 +46,7 @@ interface WordsContextType {
     getTermsForDeck: (deckId: number) => Term[];
     getProgressForTerm: (termId: number) => Progress;
     updateProgress: (termId: number, newProgress: Partial<Progress>) => void;
+    updateDeckLastStudied: (deckId: number) => Promise<void>;
 }
 
 const WordsContext = createContext<WordsContextType | undefined>(undefined);
@@ -118,6 +120,18 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         setDecks(prev => {
             const updated = prev.map(d => d.id === id ? { ...d, name } : d);
+            persistWeb('decks', updated);
+            return updated;
+        });
+    }, []);
+
+    const updateDeckLastStudied = useCallback(async (deckId: number) => {
+        const lastStudied = new Date().toISOString();
+        if (window.electronAPI) {
+            await window.electronAPI.db.updateDeckLastStudied(deckId, lastStudied);
+        }
+        setDecks(prev => {
+            const updated = prev.map(d => d.id === deckId ? { ...d, last_studied: lastStudied } : d);
             persistWeb('decks', updated);
             return updated;
         });
@@ -351,6 +365,7 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getTermsForDeck,
         getProgressForTerm,
         updateProgress,
+        updateDeckLastStudied,
     };
 
     return (
