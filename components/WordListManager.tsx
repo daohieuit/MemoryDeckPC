@@ -509,18 +509,35 @@ export const WordListManager: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={(e) => handleToggleEdit(e, deck.id)}
-                                        className={`px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center ${editModeDeckId === deck.id
-                                            ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500'
-                                            : 'text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40'
-                                            }`}
-                                    >
-                                        {editModeDeckId === deck.id
-                                            ? <><i className="fas fa-times mr-2"></i>{t("Cancel")}</>
-                                            : <><i className="fas fa-edit mr-2"></i>{t("Edit")}</>
-                                        }
-                                    </button>
+                                    {editModeDeckId === deck.id ? ( // Show Save and Cancel when in edit mode
+                                        <>
+                                            {/* Save Button */}
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); /* No save logic yet */ }}
+                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#56A652] text-white hover:brightness-90"
+                                                aria-label={t("Save changes")}
+                                            >
+                                                <i className="fas fa-save mr-2"></i> {t("Save")}
+                                            </button>
+
+                                            {/* Cancel Button */}
+                                            <button
+                                                onClick={(e) => handleToggleEdit(e, deck.id)} // This exits edit mode
+                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#AFBD96] text-[#1A2B22] hover:bg-[#CDC6AE] dark:bg-[#344E41] dark:text-white dark:hover:bg-[#3A5A40]"
+                                                aria-label={t("Cancel editing")}
+                                            >
+                                                <i className="fas fa-times mr-2"></i> {t("Cancel")}
+                                            </button>
+                                        </>
+                                    ) : ( // Show only Edit button when not in edit mode
+                                        <button
+                                            onClick={(e) => handleToggleEdit(e, deck.id)}
+                                            className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center text-[#56A652] bg-[#56A652]/20 dark:bg-[#56A652]/30 hover:bg-[#56A652]/30 dark:hover:bg-[#56A652]/40"
+                                            aria-label={t("Edit deck")}
+                                        >
+                                            <i className="fas fa-edit mr-2"></i> {t("Edit")}
+                                        </button>
+                                    )}
                                     <button
                                         onClick={(e) => { e.stopPropagation(); deleteDeck(deck.id); }}
                                         className="text-[#EE4266] hover:brightness-90 bg-[#EE4266]/20 dark:bg-[#EE4266]/30 hover:bg-[#EE4266]/30 dark:hover:bg-[#EE4266]/40 px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center"
