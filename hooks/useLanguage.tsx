@@ -187,6 +187,8 @@ const translations: Record<string, string> = {
     "Get started by creating your first deck.": "Tạo bộ thẻ đầu tiên để bắt đầu học nhé!",
     "Streak": "Chuỗi ngày",
     "Sort by": "Sắp xếp theo",
+    "Name (A-Z)": "Tên (A-Z)",
+    "Name (Z-A)": "Tên (Z-A)",
     "Alphabetical: A → Z": "Theo bảng chữ cái: A → Z",
     "Alphabetical: Z → A": "Theo bảng chữ cái: Z → A",
     "Last Studied": "Học lần cuối",

@@ -16,16 +16,16 @@ export const Home: React.FC = () => {
     const searchRef = useRef<HTMLDivElement>(null); // Ref for click-outside
     const [streakValue, setStreakValue] = useState(5); // Simulate a streak for UI purposes
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-    const [selectedSortOption, setSelectedSortOption] = useState('Alphabetical: A-Z'); // Default sort option
+    const [selectedSortOption, setSelectedSortOption] = useState(t('Name (A-Z)')); // Default sort option
     const sortDropdownRef = useRef<HTMLDivElement>(null);
 
     const { showModal, hideModal } = useModal();
 
     const SORT_OPTIONS = [
-        { key: 'alpha-asc', label: t('Alphabetical: A → Z') },
-        { key: 'alpha-desc', label: t('Alphabetical: Z → A') },
-        { key: 'last-studied', label: t('Last Studied') },
-        { key: 'created-at', label: t('Created At') },
+        { key: 'alpha-asc', iconClass: 'fas fa-arrow-down-a-z', label: t('Name (A-Z)') },
+        { key: 'alpha-desc', iconClass: 'fas fa-arrow-up-a-z', label: t('Name (Z-A)') },
+        { key: 'last-studied', iconClass: 'fas fa-clock-rotate-left', label: t('Last Studied') },
+        { key: 'created-at', iconClass: 'fas fa-calendar-plus', label: t('Created At') },
     ];
 
     const handleSortOptionClick = (option: string) => {
@@ -158,8 +158,9 @@ export const Home: React.FC = () => {
                             <button
                                 key={option.key}
                                 onClick={() => handleSortOptionClick(option.label)}
-                                className={`block w-full text-left px-4 py-2 text-[#121e18] dark:text-white transition-colors ${selectedSortOption === option.label ? 'bg-[#E0E0E0] dark:bg-[#446843] font-bold' : 'hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
+                                className={`flex items-center w-full text-left px-4 py-2 text-[#121e18] dark:text-white transition-colors ${selectedSortOption === option.label ? 'bg-[#E0E0E0] dark:bg-[#446843] font-bold' : 'hover:bg-[#E0E0E0] dark:hover:bg-[#446843]'}`}
                             >
+                                <i className={`${option.iconClass} mr-2`}></i>
                                 {option.label}
                             </button>
                         ))}
