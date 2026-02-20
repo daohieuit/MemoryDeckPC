@@ -5,7 +5,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { Term } from '../types';
 import { useParams } from 'react-router-dom';
 
-import { PencilIcon } from './icons/Icons';
+import { PencilIcon, XMarkIcon } from './icons/Icons';
 
 const formatIPA = (ipa: string): string => {
     const content = ipa.trim().replace(/^\/|\/$/g, '').trim();
@@ -459,9 +459,17 @@ export const WordListManager: React.FC = () => {
                             <div>
                                 <div className="flex items-center group">
                                     <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
-                                    {editModeDeckId === deck.id && (
-                                        <PencilIcon className="w-2.5 h-2.5 ml-2 text-gray-400 group-hover:text-white transition-all duration-300" />
-                                    )}
+                                    <button
+                                        onClick={(e) => handleToggleEdit(e, deck.id)}
+                                        className="ml-2 text-gray-400 group-hover:text-white transition-all duration-300"
+                                        aria-label={editModeDeckId === deck.id ? t("Cancel edit deck name") : t("Edit deck name")}
+                                    >
+                                        {editModeDeckId === deck.id ? (
+                                            <XMarkIcon className="w-5 h-5" />
+                                        ) : (
+                                            <PencilIcon className="w-5 h-5" />
+                                        )}
+                                    </button>
                                 </div>
                                 <p className="text-[#AFBD96] text-sm mb-0">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
