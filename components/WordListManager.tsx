@@ -365,6 +365,7 @@ export const WordListManager: React.FC = () => {
         if (isCurrentlyExpanded) {
             setExpandedDeckId(null);
             setEditModeDeckId(null); // Also exit edit mode when collapsing
+            setIsRenamingDeckNameId(null); // Also exit name edit mode
         } else {
             setExpandedDeckId(id);
         }
