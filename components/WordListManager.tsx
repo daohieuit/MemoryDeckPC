@@ -2,6 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
+import { useToast } from '../hooks/useToast';
 import { Term } from '../types';
 import { useParams } from 'react-router-dom';
 
@@ -295,8 +296,9 @@ const DeckEditor: React.FC<{ deckId: number, isEditMode: boolean, exitEditMode: 
 
 
 export const WordListManager: React.FC = () => {
-    const { decks, addDeck, deleteDeck, getTermsForDeck } = useWords();
+    const { decks, addDeck, renameDeck, deleteDeck, getTermsForDeck } = useWords();
     const { t } = useLanguage();
+    const { showToast } = useToast();
     const [newDeckName, setNewDeckName] = useState('');
     const [deckNameError, setDeckNameError] = useState<string | null>(null);
     const { deckId: paramDeckId } = useParams<{ deckId: string }>();
@@ -327,6 +329,8 @@ export const WordListManager: React.FC = () => {
     const [editModeDeckId, setEditModeDeckId] = useState<number | null>(initialDeckId);
     const [isRenamingDeckNameId, setIsRenamingDeckNameId] = useState<number | null>(null);
     const [editedDeckName, setEditedDeckName] = useState<string>(''); // New state for edited deck name
+    const [renameDeckNameError, setRenameDeckNameError] = useState<string | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
     const [newlyCreatedDeckId, setNewlyCreatedDeckId] = useState<number | null>(null);
 
     // If a deckId is provided in the URL, ensure it's expanded and in edit mode
@@ -390,6 +394,65 @@ export const WordListManager: React.FC = () => {
 
     const handleExitEditMode = () => {
         setEditModeDeckId(null);
+        setIsRenamingDeckNameId(null);
+        setRenameDeckNameError(null);
+    };
+
+    const handleSaveDeck = async (e: React.MouseEvent, deck: { id: number; name: string }) => {
+        e.stopPropagation();
+        if (isSaving) return;
+
+        // If the user was renaming, validate and commit the new name
+        if (isRenamingDeckNameId === deck.id) {
+            const trimmedName = editedDeckName.trim();
+
+            // Validation: deck name cannot be empty
+            if (!trimmedName) {
+                setRenameDeckNameError(t("Deck name cannot be empty."));
+                return;
+            }
+
+            // Validation: only allowed characters
+            if (!/^[a-zA-Z0-9 ]*$/.test(trimmedName)) {
+                setRenameDeckNameError(t("Deck name contains invalid characters. Only letters, numbers, and spaces are allowed."));
+                return;
+            }
+
+            // Validation: uniqueness (excluding the current deck)
+            if (decks.some(d => d.id !== deck.id && d.name.toLowerCase() === trimmedName.toLowerCase())) {
+                setRenameDeckNameError(t("A deck with this name already exists."));
+                return;
+            }
+
+            setRenameDeckNameError(null);
+            setIsSaving(true);
+
+            try {
+                await renameDeck(deck.id, trimmedName);
+                showToast({ message: t('Deck renamed successfully!'), duration: 3000 });
+            } catch (err) {
+                console.error('Failed to rename deck:', err);
+                showToast({ message: t('Failed to rename deck.'), duration: 3000 });
+                setIsSaving(false);
+                return;
+            }
+        }
+
+        // Exit edit mode on successful save
+        setIsSaving(false);
+        setEditModeDeckId(null);
+        setIsRenamingDeckNameId(null);
+        setRenameDeckNameError(null);
+        setNewlyCreatedDeckId(null);
+    };
+
+    const handleCancelEdit = (e: React.MouseEvent, deckId: number) => {
+        e.stopPropagation();
+        setNewlyCreatedDeckId(null);
+        setEditModeDeckId(null);
+        setIsRenamingDeckNameId(null);
+        setRenameDeckNameError(null);
+        setEditedDeckName('');
     };
 
     const filteredDecks = decks.filter(deck =>
@@ -404,17 +467,17 @@ export const WordListManager: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">{t("Create New Deck")}</h2>
                 <form onSubmit={handleAddDeck} className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row gap-4">
-                                                    <input
-                                                        type="text"
-                                                        value={newDeckName}
-                                                        onChange={(e) => {
-                                                            setNewDeckName(e.target.value);
-                                                            setDeckNameError(null); // Clear error on change
-                                                        }}
-                                                        placeholder={t("e.g., TOEIC Vocabulary")}
-                                                        maxLength={36}
-                                                        className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
-                                                    />                        <button
+                        <input
+                            type="text"
+                            value={newDeckName}
+                            onChange={(e) => {
+                                setNewDeckName(e.target.value);
+                                setDeckNameError(null); // Clear error on change
+                            }}
+                            placeholder={t("e.g., TOEIC Vocabulary")}
+                            maxLength={36}
+                            className={`flex-grow bg-[#e8e5da] dark:bg-[#446843] text-[#1A2B22] dark:text-white px-4 py-2 rounded-md border ${deckNameError ? 'border-red-500' : 'border-[#EDE9DE] dark:border-[#3A5A40]'} focus:outline-none focus:ring-2 focus:ring-[#56A652]`}
+                        />                        <button
                             type="submit"
                             className="bg-[#56A652] text-white font-bold py-2 px-6 rounded-md hover:brightness-90 transition-colors disabled:bg-[#AFBD96] dark:disabled:bg-[#3A5A40] disabled:cursor-not-allowed flex items-center justify-center"
                         >
@@ -463,13 +526,29 @@ export const WordListManager: React.FC = () => {
                             <div>
                                 <div className="flex items-center group">
                                     {isRenamingDeckNameId === deck.id ? (
-                                        <input
-                                            type="text"
-                                            value={editedDeckName}
-                                            onChange={(e) => setEditedDeckName(e.target.value)}
-                                            onClick={(e) => e.stopPropagation()} // Prevent parent deck expansion on input click
-                                            className="text-xl font-bold bg-transparent border-b border-[#56A652] dark:border-white focus:outline-none focus:ring-0 text-[#1A2B22] dark:text-white transition-colors duration-200"
-                                        />
+                                        <div className="flex flex-col">
+                                            <input
+                                                type="text"
+                                                value={editedDeckName}
+                                                onChange={(e) => {
+                                                    setEditedDeckName(e.target.value);
+                                                    setRenameDeckNameError(null); // Clear error on change
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        handleSaveDeck(e as any, deck);
+                                                    }
+                                                }}
+                                                maxLength={36}
+                                                autoFocus
+                                                className={`text-xl font-bold bg-transparent border-b ${renameDeckNameError ? 'border-red-500' : 'border-[#56A652] dark:border-white'} focus:outline-none focus:ring-0 text-[#1A2B22] dark:text-white transition-colors duration-200`}
+                                            />
+                                            {renameDeckNameError && (
+                                                <p className="text-red-500 text-xs mt-1 animate-fade-in-fast">{renameDeckNameError}</p>
+                                            )}
+                                        </div>
                                     ) : (
                                         <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
                                     )}
@@ -513,17 +592,19 @@ export const WordListManager: React.FC = () => {
                                         <>
                                             {/* Save Button */}
                                             <button
-                                                onClick={(e) => { e.stopPropagation(); /* No save logic yet */ }}
-                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#56A652] text-white hover:brightness-90"
+                                                onClick={(e) => handleSaveDeck(e, deck)}
+                                                disabled={isSaving}
+                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#56A652] text-white hover:brightness-90 disabled:opacity-60 disabled:cursor-not-allowed"
                                                 aria-label={t("Save changes")}
                                             >
-                                                <i className="fas fa-save mr-2"></i> {t("Save")}
+                                                <i className={`fas ${isSaving ? 'fa-spinner fa-spin' : 'fa-save'} mr-2`}></i> {t("Save")}
                                             </button>
 
                                             {/* Cancel Button */}
                                             <button
-                                                onClick={(e) => handleToggleEdit(e, deck.id)} // This exits edit mode
-                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#AFBD96] text-[#1A2B22] hover:bg-[#CDC6AE] dark:bg-[#344E41] dark:text-white dark:hover:bg-[#3A5A40]"
+                                                onClick={(e) => handleCancelEdit(e, deck.id)}
+                                                disabled={isSaving}
+                                                className="px-3 py-1 rounded-md transition-colors text-sm font-semibold flex items-center bg-[#AFBD96] text-[#1A2B22] hover:bg-[#CDC6AE] dark:bg-[#344E41] dark:text-white dark:hover:bg-[#3A5A40] disabled:opacity-60 disabled:cursor-not-allowed"
                                                 aria-label={t("Cancel editing")}
                                             >
                                                 <i className="fas fa-times mr-2"></i> {t("Cancel")}

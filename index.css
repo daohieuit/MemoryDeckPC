@@ -92,6 +92,26 @@
   }
 }
 
+/**
+ * Global Interactive Element Cursor
+ * Ensures all clickable elements show a pointer cursor on hover,
+ * providing clear visual feedback that they are interactive.
+ */
+button,
+a,
+[role="button"],
+summary,
+select,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+a[aria-disabled="true"],
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 @utility transform-preserve-3d {
   transform-style: preserve-3d;
 }

@@ -12,6 +12,7 @@ declare global {
             db: {
                 getDecks: () => Promise<Deck[]>;
                 addDeck: (name: string) => Promise<number>;
+                renameDeck: (id: number, name: string) => Promise<void>;
                 deleteDeck: (id: number) => Promise<void>;
                 getTerms: () => Promise<Term[]>;
                 addTerm: (deckId: number, term: string, definition: string, ipa: string, functionValue: string) => Promise<number>;
@@ -36,6 +37,7 @@ interface WordsContextType {
     terms: Term[];
     progress: Progress[];
     addDeck: (name: string) => Promise<number> | number;
+    renameDeck: (id: number, name: string) => Promise<void>;
     deleteDeck: (id: number) => void;
     addTermsToDeck: (deckId: number, newTerms: NewTerm[]) => void;
     updateTerm: (termId: number, termData: Partial<Omit<Term, 'id' | 'deck_id'>>) => void;
@@ -109,6 +111,17 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return newDeckId;
         }
     }, [decks]);
+
+    const renameDeck = useCallback(async (id: number, name: string) => {
+        if (window.electronAPI) {
+            await window.electronAPI.db.renameDeck(id, name);
+        }
+        setDecks(prev => {
+            const updated = prev.map(d => d.id === id ? { ...d, name } : d);
+            persistWeb('decks', updated);
+            return updated;
+        });
+    }, []);
 
     const deleteDeck = useCallback((id: number) => {
         showConfirm({
@@ -330,6 +343,7 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         terms,
         progress,
         addDeck,
+        renameDeck,
         deleteDeck,
         addTermsToDeck,
         updateTerm,

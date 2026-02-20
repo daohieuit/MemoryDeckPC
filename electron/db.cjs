@@ -132,6 +132,7 @@ const dbOps = {
   // Decks (formerly decks/Categories)
   getDecks: () => db.prepare('SELECT * FROM decks').all(),
   addDeck: (name) => db.prepare('INSERT INTO decks (name) VALUES (?)').run(name).lastInsertRowid,
+  renameDeck: (id, name) => db.prepare('UPDATE decks SET name = ? WHERE id = ?').run(name, id),
   deleteDeck: (id) => db.prepare('DELETE FROM decks WHERE id = ?').run(id),
 
   // Terms (formerly Words)

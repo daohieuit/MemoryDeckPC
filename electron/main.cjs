@@ -9,6 +9,7 @@ function registerIpcHandlers() {
     ipcMain.handle('app:getVersion', () => app.getVersion());
     ipcMain.handle('db:getDecks', () => dbOps.getDecks());
     ipcMain.handle('db:addDeck', (_, name) => dbOps.addDeck(name));
+    ipcMain.handle('db:renameDeck', (_, id, name) => dbOps.renameDeck(id, name));
     ipcMain.handle('db:deleteDeck', (_, id) => dbOps.deleteDeck(id));
 
     ipcMain.handle('db:getTerms', () => dbOps.getTerms());
