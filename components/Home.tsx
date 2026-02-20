@@ -15,8 +15,23 @@ export const Home: React.FC = () => {
     const [isSearchExpanded, setIsSearchExpanded] = useState(false); // New state for search bar
     const searchRef = useRef<HTMLDivElement>(null); // Ref for click-outside
     const [streakValue, setStreakValue] = useState(5); // Simulate a streak for UI purposes
+    const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+    const [selectedSortOption, setSelectedSortOption] = useState('Alphabetical: A-Z'); // Default sort option
+    const sortDropdownRef = useRef<HTMLDivElement>(null);
 
     const { showModal, hideModal } = useModal();
+
+    const SORT_OPTIONS = [
+        { key: 'alpha-asc', label: t('Alphabetical: A → Z') },
+        { key: 'alpha-desc', label: t('Alphabetical: Z → A') },
+        { key: 'last-studied', label: t('Last Studied') },
+        { key: 'created-at', label: t('Created At') },
+    ];
+
+    const handleSortOptionClick = (option: string) => {
+        setSelectedSortOption(option);
+        setIsSortDropdownOpen(false);
+    };
 
     const handleStart = (deckId: number, mode: GameMode) => {
         navigate(`/learn/${deckId}/${mode}`);
@@ -57,17 +72,20 @@ export const Home: React.FC = () => {
         deck.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Effect for handling clicks outside the search bar to collapse it
+    // Effect for handling clicks outside the search bar and sort dropdown to collapse them
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
                 setIsSearchExpanded(false);
                 setSearchTerm(''); // Clear search when collapsing
             }
+            if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+                setIsSortDropdownOpen(false);
+            }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [searchRef]);
+    }, [searchRef, sortDropdownRef]);
 
 
     return (
@@ -122,6 +140,32 @@ export const Home: React.FC = () => {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex justify-start mb-4 relative" ref={sortDropdownRef}>
+                <button
+                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                    className="flex items-center p-2 rounded-lg text-[#AFBD96] hover:text-[#56A652] transition-colors bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] shadow-sm"
+                    aria-label={t("Sort decks")}
+                >
+                    <i className="fas fa-sort-amount-down text-xl mr-2"></i>
+                    <span>{t("Sort by")}: {selectedSortOption}</span>
+                </button>
+
+                {isSortDropdownOpen && (
+                    <div className="absolute z-10 top-full left-0 mt-2 w-48 bg-white dark:bg-[#344E41] rounded-lg shadow-lg border border-[#EDE9DE] dark:border-[#3A5A40] overflow-hidden">
+                        {SORT_OPTIONS.map((option) => (
+                            <button
+                                key={option.key}
+                                onClick={() => handleSortOptionClick(option.label)}
+                                className="block w-full text-left px-4 py-2 text-[#121e18] dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#446843] transition-colors"
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {filteredDecks.length === 0 && decks.length > 0 && (
