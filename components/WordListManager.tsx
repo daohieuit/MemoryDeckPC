@@ -325,6 +325,7 @@ export const WordListManager: React.FC = () => {
 
     const [expandedDeckId, setExpandedDeckId] = useState<number | null>(initialDeckId);
     const [editModeDeckId, setEditModeDeckId] = useState<number | null>(initialDeckId);
+    const [isRenamingDeckNameId, setIsRenamingDeckNameId] = useState<number | null>(null);
     const [newlyCreatedDeckId, setNewlyCreatedDeckId] = useState<number | null>(null);
 
     // If a deckId is provided in the URL, ensure it's expanded and in edit mode
@@ -375,6 +376,7 @@ export const WordListManager: React.FC = () => {
             const isEditingThisDeck = prevId === deckId;
             if (isEditingThisDeck) {
                 // Was editing, now we cancel
+                setIsRenamingDeckNameId(null); // Clear renaming state
                 return null;
             } else {
                 // Was not editing, now we start
@@ -459,17 +461,22 @@ export const WordListManager: React.FC = () => {
                             <div>
                                 <div className="flex items-center group">
                                     <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
-                                    <button
-                                        onClick={(e) => handleToggleEdit(e, deck.id)}
-                                        className="ml-2 text-gray-400 group-hover:text-white transition-all duration-300"
-                                        aria-label={editModeDeckId === deck.id ? t("Cancel edit deck name") : t("Edit deck name")}
-                                    >
-                                        {editModeDeckId === deck.id ? (
-                                            <XMarkIcon className="w-5 h-5" />
-                                        ) : (
-                                            <PencilIcon className="w-5 h-5" />
-                                        )}
-                                    </button>
+                                    {editModeDeckId === deck.id && ( // Only render button if in general edit mode
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent parent accordion from toggling
+                                                setIsRenamingDeckNameId(prevId => prevId === deck.id ? null : deck.id);
+                                            }}
+                                            className="ml-2 text-gray-400 group-hover:text-white transition-all duration-300"
+                                            aria-label={isRenamingDeckNameId === deck.id ? t("Cancel renaming deck") : t("Rename deck")}
+                                        >
+                                            {isRenamingDeckNameId === deck.id ? ( // If actively renaming, show X
+                                                <XMarkIcon className="w-5 h-5" />
+                                            ) : ( // Otherwise, show Pencil (indicating available for rename)
+                                                <PencilIcon className="w-5 h-5" />
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                                 <p className="text-[#AFBD96] text-sm mb-0">{getTermsForDeck(deck.id).length} {t("cards")}</p>
                                 {deck.created_at && (
