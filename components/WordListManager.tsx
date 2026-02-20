@@ -467,7 +467,7 @@ export const WordListManager: React.FC = () => {
                                             value={editedDeckName}
                                             onChange={(e) => setEditedDeckName(e.target.value)}
                                             onClick={(e) => e.stopPropagation()} // Prevent parent deck expansion on input click
-                                            className="text-xl font-bold bg-transparent border-b border-[#56A652] dark:border-[#78C257] focus:outline-none focus:border-b-2 text-[#1A2B22] dark:text-white"
+                                            className="text-xl font-bold bg-transparent border-b border-[#56A652] dark:border-[#78C257] focus:ring-0 focus:shadow-[inset_0_-2px_0_0_#56A652] dark:focus:shadow-[inset_0_-2px_0_0_#78C257] text-[#1A2B22] dark:text-white"
                                         />
                                     ) : (
                                         <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white">{deck.name}</h3>
