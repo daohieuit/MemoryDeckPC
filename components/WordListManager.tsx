@@ -483,7 +483,7 @@ export const WordListManager: React.FC = () => {
                                                     setEditedDeckName(deck.name); // Initialize with current name when entering rename mode
                                                 }
                                             }}
-                                            className="ml-2 text-gray-400 group-hover:text-white transition-all duration-300"
+                                            className="ml-2 text-gray-400 group-hover:text-[#1A2B22] dark:group-hover:text-white transition-all duration-300"
                                             aria-label={isRenamingDeckNameId === deck.id ? t("Cancel renaming deck") : t("Rename deck")}
                                         >
                                             {isRenamingDeckNameId === deck.id ? ( // If actively renaming, show X
