@@ -146,7 +146,7 @@ export const Home: React.FC = () => {
             <div className="flex justify-start mb-4 relative" ref={sortDropdownRef}>
                 <button
                     onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                    className="flex items-center p-2 rounded-lg text-[#AFBD96] hover:text-[#56A652] transition-colors bg-white dark:bg-[#344E41] border border-[#EDE9DE] dark:border-[#3A5A40] shadow-sm"
+                    className="flex items-center p-1.5 rounded-full text-[#AFBD96] hover:text-[#56A652] transition-colors hover:bg-gray-200 dark:hover:bg-[#446843]"
                     aria-label={t("Sort decks")}
                 >
                     <i className="fas fa-sort-amount-down text-xl"></i>
