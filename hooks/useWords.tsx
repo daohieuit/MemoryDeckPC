@@ -3,7 +3,9 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useToast } from './useToast';
 import { useModal } from './useModal';
 import { useLanguage } from './useLanguage';
-import { Deck, Term, Progress, ProgressStatus } from '../types';
+import { Deck, Term, Progress } from '../types';
+import { createEmptyCard } from 'ts-fsrs';
+import { FlashcardSettings } from '../components/FlashcardSettingsModal';
 
 declare global {
     interface Window {
@@ -20,7 +22,10 @@ declare global {
                 updateTerm: (termId: number, termData: Partial<Omit<Term, 'id' | 'deck_id'>>) => Promise<void>;
                 deleteTerm: (termId: number) => Promise<void>;
                 getAllProgress: () => Promise<Progress[]>;
-                updateProgress: (termId: number, status: ProgressStatus, lastReviewed: string) => Promise<void>;
+                updateProgress: (termId: number, card: Progress) => Promise<void>;
+                getFlashcardSettings: (deckId: number) => Promise<any>;
+                saveFlashcardSettings: (deckId: number, settings: any) => Promise<void>;
+                deleteFlashcardSettings: (deckId: number) => Promise<void>;
             };
         };
     }
@@ -47,6 +52,8 @@ interface WordsContextType {
     getProgressForTerm: (termId: number) => Progress;
     updateProgress: (termId: number, newProgress: Partial<Progress>) => void;
     updateDeckLastStudied: (deckId: number) => Promise<void>;
+    getFlashcardSettings: (deckId: number) => Promise<FlashcardSettings>;
+    saveFlashcardSettings: (deckId: number, settings: FlashcardSettings) => Promise<void>;
 }
 
 const WordsContext = createContext<WordsContextType | undefined>(undefined);
@@ -272,8 +279,7 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         if (progressToDelete) {
                             await window.electronAPI.db.updateProgress(
                                 newId,
-                                progressToDelete.status,
-                                progressToDelete.last_reviewed
+                                progressToDelete
                             );
                             const restoredProgress: Progress = { ...progressToDelete, term_id: newId };
                             setProgress(prev => [...prev, restoredProgress].sort((a, b) => a.term_id - b.term_id));
@@ -317,22 +323,23 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const p = progress.find(p => p.term_id === termId);
         if (p) return p;
 
+        const emptyCard = createEmptyCard();
         return {
+            ...emptyCard,
             term_id: termId,
-            status: ProgressStatus.New,
-            last_reviewed: new Date().toISOString()
-        };
+            due: emptyCard.due.toISOString(),
+            last_review: emptyCard.last_review?.toISOString()
+        } as Progress;
     }, [progress]);
 
     const updateProgress = useCallback(async (termId: number, newProgress: Partial<Progress>) => {
         const current = getProgressForTerm(termId);
-        const updatedProgress = { ...current, ...newProgress, last_reviewed: new Date().toISOString() };
+        const updatedProgress = { ...current, ...newProgress };
 
         if (window.electronAPI) {
             await window.electronAPI.db.updateProgress(
                 termId,
-                updatedProgress.status,
-                updatedProgress.last_reviewed
+                updatedProgress
             );
         }
 
@@ -350,6 +357,61 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
     }, [getProgressForTerm]);
 
+    const GLOBAL_DEFAULTS: FlashcardSettings = {
+        sequence: 'default',
+        autoPlayAudio: true,
+        showReviewPrompt: true
+    };
+
+    const getFlashcardSettings = useCallback(async (deckId: number): Promise<FlashcardSettings> => {
+        if (window.electronAPI?.db?.getFlashcardSettings) {
+            try {
+                const saved = await window.electronAPI.db.getFlashcardSettings(deckId);
+                if (saved) {
+                    return {
+                        sequence: saved.sequence,
+                        autoPlayAudio: saved.auto_play_audio === 1,
+                        showReviewPrompt: saved.show_review_prompt === 1
+                    };
+                }
+            } catch (err) {
+                console.error("Failed to load flashcard settings from SQLite:", err);
+                // If the handler is not registered or call fails, fallback to localStorage
+                if (err.message && err.message.includes('No handler registered')) {
+                    const key = `flashcard_settings_${deckId}`;
+                    const saved = localStorage.getItem(key);
+                    if (saved) {
+                        return JSON.parse(saved);
+                    }
+                }
+            }
+        } else {
+            // localStorage fallback when electronAPI not available
+            const key = `flashcard_settings_${deckId}`;
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        }
+        return GLOBAL_DEFAULTS;
+    }, []);
+
+    const saveFlashcardSettings = useCallback(async (deckId: number, settings: FlashcardSettings) => {
+        if (window.electronAPI?.db?.saveFlashcardSettings) {
+            try {
+                await window.electronAPI.db.saveFlashcardSettings(deckId, settings);
+            } catch (err) {
+                console.error("Failed to save flashcard settings to SQLite:", err);
+                if (err.message && err.message.includes('No handler registered')) {
+                    localStorage.setItem(`flashcard_settings_${deckId}`, JSON.stringify(settings));
+                }
+            }
+        } else {
+            // localStorage fallback when electronAPI not available
+            localStorage.setItem(`flashcard_settings_${deckId}`, JSON.stringify(settings));
+        }
+    }, []);
+
     if (!isLoaded) return null; // Or a loading spinner
 
     const value = {
@@ -366,6 +428,8 @@ export const WordProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getProgressForTerm,
         updateProgress,
         updateDeckLastStudied,
+        getFlashcardSettings,
+        saveFlashcardSettings,
     };
 
     return (

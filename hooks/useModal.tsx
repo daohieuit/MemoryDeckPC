@@ -10,6 +10,9 @@ export interface ModalOptions {
     headerButtons?: React.ReactNode;
     cancelText?: string;
     onCancel?: () => void;
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    hideCloseButton?: boolean;
+    hideFooter?: boolean;
 }
 
 interface ModalContextType {

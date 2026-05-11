@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useLanguage } from '../hooks/useLanguage';
+import { useToast } from '../hooks/useToast';
 import { Deck, GameMode } from '../types';
 import { PencilIcon } from './icons/Icons';
 import { useModal } from '../hooks/useModal';
 import { LearningModeSelector } from './LearningModeSelector';
+import { SnowfallEffect } from './SnowfallEffect';
+import { DeckModalContent } from './DeckModalContent';
 
 export const Home: React.FC = () => {
-    const { decks, getTermsForDeck } = useWords();
+    const { decks, getTermsForDeck, progress } = useWords();
     const navigate = useNavigate();
     const { t } = useLanguage();
+    const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false); // New state for search bar
     const searchRef = useRef<HTMLDivElement>(null); // Ref for click-outside
@@ -19,8 +23,78 @@ export const Home: React.FC = () => {
     const [currentSortKey, setCurrentSortKey] = useState('name'); // Default sort key
     const [currentSortDirection, setCurrentSortDirection] = useState('asc'); // Default direction for all (Ascending)
     const sortDropdownRef = useRef<HTMLDivElement>(null);
+    const [isSnowfallActive, setIsSnowfallActive] = useState(false);
+    const [isCooldown, setIsCooldown] = useState(false);
+
+    const handleFabClick = () => {
+        if (!isCooldown) {
+            setIsSnowfallActive(true);
+            setIsCooldown(true);
+            setTimeout(() => {
+                setIsSnowfallActive(false);
+                setIsCooldown(false);
+            }, 10000);
+        }
+    };
 
     const { showModal, hideModal } = useModal();
+
+    // Helper to get next review status for a deck (similar to WordListManager)
+    const getDeckStatus = (deckId: number): { text: string; isDue: boolean } => {
+        const terms = getTermsForDeck(deckId);
+        if (terms.length === 0) {
+            return { text: "", isDue: false };
+        }
+
+        const now = new Date();
+        let earliestDue: Date | null = null;
+        let hasDueCards = false;
+
+        for (const term of terms) {
+            const termProgress = progress.find(p => p.term_id === term.id);
+            // If no progress exists, this is a new card - it's due now
+            if (!termProgress) {
+                hasDueCards = true;
+                earliestDue = now;
+                continue;
+            }
+
+            const dueDate = new Date(termProgress.due);
+            if (dueDate <= now) {
+                hasDueCards = true;
+                if (!earliestDue || dueDate < earliestDue) {
+                    earliestDue = dueDate;
+                }
+            } else if (!hasDueCards) {
+                if (!earliestDue || dueDate < earliestDue) {
+                    earliestDue = dueDate;
+                }
+            }
+        }
+
+        if (!earliestDue) {
+            return { text: "", isDue: false };
+        }
+
+        const diffMs = earliestDue.getTime() - now.getTime();
+        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (hasDueCards) {
+            if (diffMinutes <= 0) return { text: "Now", isDue: true };
+            if (diffMinutes < 60) return { text: `${diffMinutes}m`, isDue: true };
+            if (diffHours < 24) return { text: `${diffHours}h`, isDue: true };
+            if (diffDays <= 3) return { text: `${diffDays}d`, isDue: true };
+            return { text: earliestDue.toLocaleDateString('en-GB'), isDue: true };
+        } else {
+            if (diffMinutes < 60 && diffMinutes > 0) return { text: `${diffMinutes}m`, isDue: false };
+            if (diffHours < 24) return { text: `${diffHours}h`, isDue: false };
+            if (diffDays === 1) return { text: "1d", isDue: false };
+            if (diffDays <= 7) return { text: `${diffDays}d`, isDue: false };
+            return { text: earliestDue.toLocaleDateString('en-GB'), isDue: false };
+        }
+    };
 
     const SORT_OPTIONS = [
         {
@@ -61,6 +135,71 @@ export const Home: React.FC = () => {
             hideModal(); // Close modal after navigating
         };
 
+        // Calculate next review status for badge
+        const getNextReviewStatus = (deckId: number): { text: string; isDue: boolean } => {
+            const terms = getTermsForDeck(deckId);
+            if (terms.length === 0) {
+                return { text: "", isDue: false };
+            }
+
+            const now = new Date();
+            let earliestDue: Date | null = null;
+            let hasDueCards = false;
+
+            for (const term of terms) {
+                const termProgress = progress.find(p => p.term_id === term.id);
+                if (!termProgress) {
+                    hasDueCards = true;
+                    earliestDue = now;
+                    continue;
+                }
+
+                const dueDate = new Date(termProgress.due);
+                if (dueDate <= now) {
+                    hasDueCards = true;
+                    if (!earliestDue || dueDate < earliestDue) {
+                        earliestDue = dueDate;
+                    }
+                } else if (!hasDueCards) {
+                    if (!earliestDue || dueDate < earliestDue) {
+                        earliestDue = dueDate;
+                    }
+                }
+            }
+
+            if (!earliestDue) {
+                return { text: "", isDue: false };
+            }
+
+            const diffMs = earliestDue.getTime() - now.getTime();
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (hasDueCards) {
+                if (diffMinutes <= 0) return { text: "Now", isDue: true };
+                if (diffMinutes < 60) return { text: `${diffMinutes}m`, isDue: true };
+                if (diffHours < 24) return { text: `${diffHours}h`, isDue: true };
+                if (diffDays <= 3) return { text: `${diffDays}d`, isDue: true };
+                return { text: earliestDue.toLocaleDateString('en-GB'), isDue: true };
+            } else {
+                if (diffMinutes < 60 && diffMinutes > 0) return { text: `${diffMinutes}m`, isDue: false };
+                if (diffHours < 24) return { text: `${diffHours}h`, isDue: false };
+                if (diffDays === 1) return { text: "1d", isDue: false };
+                if (diffDays <= 7) return { text: `${diffDays}d`, isDue: false };
+                return { text: earliestDue.toLocaleDateString('en-GB'), isDue: false };
+            }
+        };
+
+        const nextReview = getNextReviewStatus(deck.id);
+        const nextReviewBadge = nextReview.text ? (
+            <div className={`px-2.5 py-1 rounded-full text-xs font-bold shadow-sm whitespace-nowrap ${
+                nextReview.isDue ? 'bg-[#EE4266] text-white' : 'bg-[#56A652] text-white'
+            }`}>
+                {nextReview.text}
+            </div>
+        ) : null;
+
         const editButton = (
             <button
                 onClick={handleEditDeck}
@@ -71,10 +210,28 @@ export const Home: React.FC = () => {
             </button>
         );
 
+        const handleOpenCardList = () => {
+            hideModal();
+            showModal({
+                title: t("Cards in: {0}", deck.name),
+                size: 'lg',
+                message: (
+                    <DeckModalContent
+                        deckId={deck.id}
+                        mode="manage-cards"
+                        onClose={hideModal}
+                        onSaved={() => {
+                            showToast({ message: t("Cards updated successfully!") });
+                        }}
+                    />
+                ),
+            });
+        };
+
         showModal({
             title: deck.name,
-            message: <LearningModeSelector deck={deck} handleStart={handleStart} onClose={hideModal} />,
-            headerButtons: editButton,
+            message: <LearningModeSelector deck={deck} handleStart={handleStart} onClose={hideModal} onOpenCardList={handleOpenCardList} />,
+            headerButtons: [nextReviewBadge, editButton].filter(Boolean) as React.ReactNode[],
         });
     };
 
@@ -207,15 +364,15 @@ export const Home: React.FC = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-                    {filteredDecks.map(deck => (
+                    {filteredDecks.map(deck => {
+                        const deckStatus = getDeckStatus(deck.id);
+                        return (
                         <div key={deck.id} onClick={() => openModeModal(deck)} className="bg-white dark:bg-[#344E41] rounded-xl shadow-lg border border-[#EDE9DE] dark:border-[#3A5A40] overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 relative cursor-pointer">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); navigate(`/manage-words/${deck.id}`); }}
-                                className="absolute top-3 right-3 p-2 rounded-full bg-gray-200 dark:bg-[#446843] text-[#121e18] dark:text-white hover:bg-gray-300 dark:hover:bg-[#56A652] transition-colors duration-200"
-                                aria-label={t("Edit Deck")}
-                            >
-                                <PencilIcon className="w-5 h-5" />
-                            </button>
+                            {deckStatus.text && (
+                                <div className={`absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${deckStatus.isDue ? 'bg-[#EE4266] text-white' : 'bg-[#56A652] text-white'}`}>
+                                    {deckStatus.text}
+                                </div>
+                            )}
                             <div className="px-6 pt-6 pb-2">
                                 <h2 className="text-2xl font-bold text-[#121e18] dark:text-white h-18 line-clamp-2 break-words text-start">{deck.name}</h2>
                                 <p className="text-[#AFBD96] text-sm mb-2">{getTermsForDeck(deck.id).length} {t("cards")}</p>
@@ -243,10 +400,30 @@ export const Home: React.FC = () => {
                                     })()}
                                 </p>
                             </div>
+                            <div className="px-6 pb-6 pt-2">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/learn/${deck.id}/study`); }}
+                                    className="w-full bg-[#56A652] text-white font-bold py-3 px-4 rounded-xl shadow-[0_4px_0_rgb(67,130,64)] hover:shadow-[0_2px_0_rgb(67,130,64)] hover:translate-y-[2px] transition-all duration-150 active:shadow-none active:translate-y-[4px] focus:outline-none focus:ring-2 focus:ring-[#56A652] focus:ring-opacity-75"
+                                >
+                                    {t("Study")}
+                                </button>
+                            </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
+
+            {/* Floating Action Button */}
+            <button
+                onClick={handleFabClick}
+                className="fixed bottom-6 right-6 bg-[#124170] text-white font-bold py-2 px-6 rounded-xl shadow-[0_6px_0_rgb(0,35,82)] ring-2 ring-[#124170] ring-opacity-40 hover:shadow-[0_3px_0_rgb(0,35,82)] hover:ring-opacity-60 hover:translate-y-[3px] active:shadow-none active:ring-0 active:translate-y-[6px] transition-all duration-150 whitespace-nowrap z-50"
+                aria-label={t("Quick Action")}
+            >
+                {t("Click me")}
+            </button>
+
+            {isSnowfallActive && <SnowfallEffect duration={10000} onEnd={() => setIsSnowfallActive(false)} />}
         </div>
     );
 };

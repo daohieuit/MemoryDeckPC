@@ -5,9 +5,10 @@ export interface ModeResults {
     // Flashcard Mode
     flashcard?: {
         totalCards: number;
-        easy: number;
-        good: number;
+        again: number;
         hard: number;
+        good: number;
+        easy: number;
     };
     // Quiz Mode
     quiz?: {

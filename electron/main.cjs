@@ -20,8 +20,12 @@ function registerIpcHandlers() {
     ipcMain.handle('db:deleteTerm', (_, termId) => dbOps.deleteTerm(termId));
 
     ipcMain.handle('db:getAllProgress', () => dbOps.getAllProgress());
-    ipcMain.handle('db:updateProgress', (_, termId, status, lastReviewed) =>
-        dbOps.updateProgress(termId, status, lastReviewed));
+    ipcMain.handle('db:updateProgress', (_, termId, card) =>
+        dbOps.updateProgress(termId, card));
+
+    ipcMain.handle('db:getFlashcardSettings', (_, deckId) => dbOps.getFlashcardSettings(deckId));
+    ipcMain.handle('db:saveFlashcardSettings', (_, deckId, settings) => dbOps.saveFlashcardSettings(deckId, settings));
+    ipcMain.handle('db:deleteFlashcardSettings', (_, deckId) => dbOps.deleteFlashcardSettings(deckId));
 }
 
 function createWindow() {

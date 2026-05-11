@@ -15,7 +15,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
         deleteTerm: (termId) => ipcRenderer.invoke('db:deleteTerm', termId),
 
         getAllProgress: () => ipcRenderer.invoke('db:getAllProgress'),
-        updateProgress: (termId, status, lastReviewed) =>
-            ipcRenderer.invoke('db:updateProgress', termId, status, lastReviewed),
+        updateProgress: (termId, card) =>
+            ipcRenderer.invoke('db:updateProgress', termId, card),
+
+        getFlashcardSettings: (deckId) => ipcRenderer.invoke('db:getFlashcardSettings', deckId),
+        saveFlashcardSettings: (deckId, settings) => ipcRenderer.invoke('db:saveFlashcardSettings', deckId, settings),
+        deleteFlashcardSettings: (deckId) => ipcRenderer.invoke('db:deleteFlashcardSettings', deckId),
     }
 });

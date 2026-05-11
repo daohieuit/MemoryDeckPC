@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react'; // Import useRef
+import React, { useEffect, useState, useRef } from 'react';
 import { useModal, ModalOptions } from '../hooks/useModal';
 import { useLanguage } from '../hooks/useLanguage';
 
@@ -10,35 +10,42 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
     onConfirm,
     confirmVariant = 'primary',
     onDismiss,
-    headerButtons // Added headerButtons to destructuring
+    headerButtons,
+    cancelText,
+    onCancel,
+    size = 'md',
+    hideCloseButton = false,
+    hideFooter = false
 }) => {
     const [isExiting, setIsExiting] = useState(false);
     const { t } = useLanguage();
-    const modalContentRef = useRef<HTMLDivElement>(null); // Ref for modal content
+    const modalContentRef = useRef<HTMLDivElement>(null);
 
-    const handleClose = () => {
+    const dismissModal = () => {
         setIsExiting(true);
         setTimeout(onDismiss, 200);
     };
 
-    const handleConfirm = () => {
-        if (onConfirm) {
-            onConfirm();
-        }
-        handleClose();
+    const handleCancel = () => {
+        onCancel?.();
+        dismissModal();
     };
 
-    // Effect for outside click and Escape key
+    const handleConfirm = () => {
+        onConfirm?.();
+        dismissModal();
+    };
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (modalContentRef.current && !modalContentRef.current.contains(event.target as Node)) {
-                handleClose();
+                handleCancel();
             }
         };
 
         const handleEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                handleClose();
+                handleCancel();
             }
         };
 
@@ -49,53 +56,64 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('keydown', handleEscape);
         };
-    }, [onDismiss]); // Depend on onDismiss to ensure handleClose is up-to-date
+    }, [onCancel]);
 
     const confirmClasses = {
         primary: 'bg-[#56A652] text-white hover:brightness-90',
         danger: 'bg-[#EE4266] text-white hover:brightness-90',
     };
 
+    const sizeClasses = {
+        sm: 'max-w-sm',
+        md: 'max-w-md',
+        lg: 'max-w-4xl',
+        xl: 'max-w-6xl',
+    };
+
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-fast p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-fast p-4 md:p-8">
             <div
-                ref={modalContentRef} // Attach ref here
-                className={`bg-white dark:bg-[#344E41] rounded-lg shadow-xl w-full max-w-md border border-[#EDE9DE] dark:border-[#3A5A40] ${isExiting ? 'animate-scale-out' : 'animate-scale-in'}`}
+                ref={modalContentRef}
+                className={`bg-white dark:bg-[#344E41] rounded-2xl shadow-2xl w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col border border-[#EDE9DE] dark:border-[#3A5A40] overflow-hidden ${isExiting ? 'animate-scale-out' : 'animate-scale-in'}`}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-title"
             >
-                <div className="p-6">
-                    <div className="flex justify-between items-center mb-2"> {/* Flex container for title and close button */}
-                        <h2 id="modal-title" className="text-2xl font-bold text-[#121e18] dark:text-white">{title}</h2>
-                        <div className="flex items-center gap-2"> {/* Group for header buttons and close button */}
-                            {headerButtons}
+                <div className="px-6 py-4 border-b border-[#EDE9DE] dark:border-[#3A5A40] flex justify-between items-center bg-white dark:bg-[#344E41] shrink-0">
+                    <h2 id="modal-title" className="text-xl md:text-2xl font-bold text-[#121e18] dark:text-white truncate pr-4">{title}</h2>
+                    <div className="flex items-center gap-3">
+                        {headerButtons}
+                        {!hideCloseButton && (
                             <button
-                                onClick={handleClose}
-                                className="text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-colors"
+                                onClick={handleCancel}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-[#446843] text-[#AFBD96] hover:text-[#1A2B22] dark:hover:text-white transition-all"
                                 aria-label="Close modal"
                             >
                                 <i className="fas fa-times"></i>
                             </button>
-                        </div>
-                    </div>
-                    <div className="mt-2 text-[#121e18]/80 dark:text-white/80">
-                        {typeof message === 'string' ? <p>{message}</p> : message}
+                        )}
                     </div>
                 </div>
-                {onConfirm && (
-                    <div className="bg-[#EFF1F2] dark:bg-[#4D6A53]/50 px-6 py-4 flex justify-end gap-4 rounded-b-lg">
+
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                    <div className="text-[#121e18]/80 dark:text-white/80">
+                        {typeof message === 'string' ? <p className="leading-relaxed">{message}</p> : message}
+                    </div>
+                </div>
+
+                {onConfirm && !hideFooter && (
+                    <div className="px-6 py-4 bg-[#F8FAFB] dark:bg-[#2A3F35] border-t border-[#EDE9DE] dark:border-[#3A5A40] flex justify-end gap-3 shrink-0">
                         <button
                             type="button"
-                            onClick={handleClose}
-                            className="px-4 py-2 rounded-md text-[#121e18] dark:text-white bg-[#e8e5da] dark:bg-[#344e41] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-medium"
+                            onClick={handleCancel}
+                            className="px-5 py-2 rounded-lg text-[#121e18] dark:text-white bg-[#e8e5da] dark:bg-[#344e41] hover:bg-[#CDC6AE] dark:hover:bg-[#467645] transition-colors font-semibold text-sm"
                         >
-                            {t("Cancel")}
+                            {cancelText || t("Cancel")}
                         </button>
                         <button
                             type="button"
                             onClick={handleConfirm}
-                            className={`px-4 py-2 rounded-md transition-colors font-semibold ${confirmClasses[confirmVariant]}`}
+                            className={`px-6 py-2 rounded-lg transition-all font-bold text-sm shadow-sm ${confirmClasses[confirmVariant]}`}
                         >
                             {confirmText || t('Confirm')}
                         </button>
@@ -106,11 +124,10 @@ const Modal: React.FC<ModalOptions & { onDismiss: () => void }> = ({
     );
 };
 
-
 export const ModalContainer: React.FC = () => {
     const { modal, hideModal } = useModal();
 
     if (!modal) return null;
 
     return <Modal {...modal} onDismiss={hideModal} />;
-};
+};

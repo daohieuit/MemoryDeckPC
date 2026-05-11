@@ -85,6 +85,65 @@ function initDatabase() {
         console.log('Could not drop difficulty_level:', e.message);
       }
     }
+
+    // FSRS Migration
+    if (!progressColumns.includes('stability')) {
+      console.log('Migrating progress table to FSRS schema...');
+      try {
+        db.exec('ALTER TABLE progress RENAME TO progress_old');
+        db.exec(`
+          CREATE TABLE progress (
+            term_id INTEGER PRIMARY KEY,
+            due TEXT NOT NULL,
+            stability REAL NOT NULL,
+            difficulty REAL NOT NULL,
+            elapsed_days INTEGER NOT NULL,
+            scheduled_days INTEGER NOT NULL,
+            reps INTEGER NOT NULL,
+            lapses INTEGER NOT NULL,
+            state INTEGER NOT NULL,
+            last_review TEXT,
+            FOREIGN KEY (term_id) REFERENCES terms (id) ON DELETE CASCADE
+          )
+        `);
+
+        const oldData = db.prepare('SELECT * FROM progress_old').all();
+        const now = new Date().toISOString();
+        const in3Days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+
+        const insert = db.prepare(`
+          INSERT INTO progress (term_id, due, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, state, last_review)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        for (const row of oldData) {
+          let state = 0; // New
+          let due = now;
+          let stability = 0;
+          let difficulty = 0;
+          let reps = 0;
+
+          // Simple mapping for migration
+          if (row.status === '1' || row.status === 1) { // Learning
+            state = 1;
+            reps = 1;
+            stability = 1;
+            difficulty = 5;
+          } else if (row.status === '2' || row.status === 2) { // Mastered
+            state = 2; // Review
+            due = in3Days;
+            stability = 5;
+            difficulty = 5;
+            reps = 1;
+          }
+
+          insert.run(row.term_id, due, stability, difficulty, 0, 0, reps, 0, state, row.last_reviewed || null);
+        }
+        db.exec('DROP TABLE progress_old');
+      } catch (e) {
+        console.error('FSRS migration failed:', e.message);
+      }
+    }
   }
 
   // Create tables with new schema
@@ -107,9 +166,24 @@ function initDatabase() {
 
     CREATE TABLE IF NOT EXISTS progress (
       term_id INTEGER PRIMARY KEY,
-      status TEXT,
-      last_reviewed TEXT,
+      due TEXT NOT NULL,
+      stability REAL NOT NULL,
+      difficulty REAL NOT NULL,
+      elapsed_days INTEGER NOT NULL,
+      scheduled_days INTEGER NOT NULL,
+      reps INTEGER NOT NULL,
+      lapses INTEGER NOT NULL,
+      state INTEGER NOT NULL,
+      last_review TEXT,
       FOREIGN KEY (term_id) REFERENCES terms (id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS flashcard_settings (
+      deck_id INTEGER PRIMARY KEY,
+      sequence TEXT NOT NULL DEFAULT 'default',
+      auto_play_audio INTEGER NOT NULL DEFAULT 1,
+      show_review_prompt INTEGER NOT NULL DEFAULT 1,
+      FOREIGN KEY (deck_id) REFERENCES decks (id) ON DELETE CASCADE
     );
   `);
 
@@ -160,15 +234,35 @@ const createDbOps = (dbInstance) => ({
 
   // Progress
   getAllProgress: () => dbInstance.prepare('SELECT * FROM progress').all(),
-  updateProgress: (termId, status, lastReviewed) => {
+  updateProgress: (termId, card) => {
+    const { due, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, state, last_review } = card;
     return dbInstance.prepare(`
-      INSERT INTO progress (term_id, status, last_reviewed)
-      VALUES (?, ?, ?)
+      INSERT INTO progress (term_id, due, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, state, last_review)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(term_id) DO UPDATE SET
-        status = excluded.status,
-        last_reviewed = excluded.last_reviewed
-    `).run(termId, status, lastReviewed);
-  }
+        due = excluded.due,
+        stability = excluded.stability,
+        difficulty = excluded.difficulty,
+        elapsed_days = excluded.elapsed_days,
+        scheduled_days = excluded.scheduled_days,
+        reps = excluded.reps,
+        lapses = excluded.lapses,
+        state = excluded.state,
+        last_review = excluded.last_review
+    `).run(termId, due, stability, difficulty, elapsed_days, scheduled_days, reps, lapses, state, last_review);
+  },
+
+  // Flashcard Settings
+  getFlashcardSettings: (deckId) => dbInstance.prepare('SELECT * FROM flashcard_settings WHERE deck_id = ?').get(deckId),
+  saveFlashcardSettings: (deckId, settings) => dbInstance.prepare(`
+    INSERT INTO flashcard_settings (deck_id, sequence, auto_play_audio, show_review_prompt)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(deck_id) DO UPDATE SET
+      sequence = excluded.sequence,
+      auto_play_audio = excluded.auto_play_audio,
+      show_review_prompt = excluded.show_review_prompt
+  `).run(deckId, settings.sequence, settings.autoPlayAudio ? 1 : 0, settings.showReviewPrompt ? 1 : 0),
+  deleteFlashcardSettings: (deckId) => dbInstance.prepare('DELETE FROM flashcard_settings WHERE deck_id = ?').run(deckId)
 });
 
 module.exports = { initDatabase, createDbOps };

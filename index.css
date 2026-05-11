@@ -170,3 +170,18 @@ a[aria-disabled="true"],
   /* Slightly lighter on hover for better feedback. */
   background-color: #588157;
 }
+
+/**
+ * Accessibility: Reduced Motion Support
+ * Respects user's motion preferences and disables animations for users
+ * who have set prefers-reduced-motion to reduce in their OS settings.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

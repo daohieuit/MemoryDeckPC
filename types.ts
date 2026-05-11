@@ -14,16 +14,19 @@ export interface Term {
     function: string;
 }
 
+import { State } from 'ts-fsrs';
+
 export interface Progress {
     term_id: number;
-    status: ProgressStatus;
-    last_reviewed: string; // ISO 8601 date string
-}
-
-export enum ProgressStatus {
-    New = 0,
-    Learning = 1,
-    Mastered = 2,
+    due: string;
+    stability: number;
+    difficulty: number;
+    elapsed_days: number;
+    scheduled_days: number;
+    reps: number;
+    lapses: number;
+    state: State;
+    last_review?: string;
 }
 
 export enum GameMode {
@@ -31,4 +34,5 @@ export enum GameMode {
     Quiz = 'quiz',
     Matching = 'matching',
     Spelling = 'spelling',
+    Study = 'study',
 }

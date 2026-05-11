@@ -189,7 +189,31 @@ const translations: Record<string, string> = {
     "Sort by": "Sắp xếp theo",
     "Name": "Tên",
     "Last Studied": "Học lần cuối",
-    "Created At": "Ngày tạo"
+    "Created At": "Ngày tạo",
+    "Cards in: {0}": "Danh sách thẻ: {0}",
+    // Flashcard Settings
+    "Settings": "Cài đặt",
+    "Sequence": "Thứ tự",
+    "Default": "Mặc định",
+    "Alpha": "A-Z",
+    "Random": "Ngẫu nhiên",
+    "Auto-play Audio": "Tự động phát âm thanh",
+    "Show Review Prompt": "Hiển thị màn hình tóm tắt",
+    "Reset to Default": "Khôi phục mặc định",
+    "Review": "Ôn tập",
+    "Round Complete!": "Hoàn thành vòng học!",
+    "Again": "Lại",
+    "Hard": "Khó",
+    "Good": "Tốt",
+    "Easy": "Dễ",
+    "Total": "Tổng",
+    "All cards mastered!": "Mastered cả rồi!",
+    "Review Complete!": "Ôn tập hoàn thành!",
+    "You reviewed": "Bạn đã ôn",
+    "cards": "thẻ",
+    "No Struggled Cards": "Không có thẻ cần ôn",
+    "All cards were mastered! No cards to review.": "Tất cả thẻ đều đã master! Không có thẻ nào cần ôn.",
+    "Loading settings...": "Đang tải cài đặt..."
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

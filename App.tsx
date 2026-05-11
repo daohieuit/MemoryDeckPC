@@ -4,18 +4,21 @@ import { HashRouter, Routes, Route, NavLink, useParams, useNavigate } from 'reac
 import { WordProvider, useWords } from './hooks/useWords';
 import { ToastProvider } from './hooks/useToast';
 import { ModalProvider } from './hooks/useModal';
+import { StudySessionProvider } from './hooks/useStudySessionContext';
 import { SessionResultsProvider } from './hooks/useSessionResults';
 import { Home } from './components/Home';
 import { FlashcardMode } from './components/FlashcardMode';
 import { QuizMode } from './components/QuizMode';
 import { MatchingMode } from './components/MatchingMode';
 import { SpellingMode } from './components/SpellingMode';
+import { StudySession } from './components/StudySession';
 import { DeckCompletedSummary } from './components/DeckCompletedSummary'; // New import
 import { WordListManager } from './components/WordListManager';
 import { ToastContainer } from './components/Toast';
 import { ModalContainer } from './components/Modal';
+import { NavigationGuard } from './components/NavigationGuard';
 import { GameMode } from './types';
-import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon, InformationCircleIcon } from './components/icons/Icons';
+import { BookOpenIcon, PencilIcon, PuzzlePieceIcon, QuestionMarkCircleIcon, Squares2X2Icon, GearIcon, SunIcon, MoonIcon, GlobeAltIcon, InformationCircleIcon, SparklesIcon, ArrowPathIcon, LightningBoltIcon } from './components/icons/Icons';
 
 import { LanguageProvider, useLanguage } from './hooks/useLanguage';
 import { useModal } from './hooks/useModal'; // Import useModal hook
@@ -115,24 +118,27 @@ const AppContent: React.FC = () => {
         <ToastProvider>
             <ModalProvider>
                 <WordProvider>
-                    <SessionResultsProvider>
-                        <HashRouter>
-                            <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
-                                <Header theme={theme} toggleTheme={toggleTheme} />
-                                <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
-                                    <Routes>
-                                        <Route path="/" element={<Home />} />
-                                        <Route path="/manage-words/:deckId?" element={<WordListManager />} />
-                                        <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
-                                        <Route path="/learn/:deckId/summary" element={<DeckCompletedSummary />} /> {/* New Route */}
-                                        <Route path="/about" element={<AboutPage />} />
-                                    </Routes>
-                                </main>
-                                <ToastContainer />
-                                <ModalContainer />
-                            </div>
-                        </HashRouter>
-                    </SessionResultsProvider>
+                    <StudySessionProvider>
+                        <SessionResultsProvider>
+                            <HashRouter>
+                                <div className="min-h-screen flex flex-col bg-[#F1F5F9] dark:bg-[#1A2B22] text-[#1A2B22] dark:text-[#F1F5F9] font-sans">
+                                    <Header theme={theme} toggleTheme={toggleTheme} />
+                                    <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+                                        <Routes>
+                                            <Route path="/" element={<Home />} />
+                                            <Route path="/manage-words/:deckId?" element={<WordListManager />} />
+                                            <Route path="/learn/:deckId/:mode" element={<LearnScreen />} />
+                                            <Route path="/learn/:deckId/summary" element={<DeckCompletedSummary />} /> {/* New Route */}
+                                            <Route path="/about" element={<AboutPage />} />
+                                        </Routes>
+                                    </main>
+                                    <ToastContainer />
+                                    <ModalContainer />
+                                </div>
+                                <NavigationGuard />
+                            </HashRouter>
+                        </SessionResultsProvider>
+                    </StudySessionProvider>
                 </WordProvider>
             </ModalProvider>
         </ToastProvider>
@@ -179,6 +185,12 @@ const Header: React.FC<{ theme: string, toggleTheme: () => void }> = ({ theme, t
                     <span>MemoryDeck</span>
                 </NavLink>
                 <div className="flex items-center space-x-2 md:space-x-4">
+                    <button
+                        className="bg-[#a65256] text-white font-extrabold py-1.5 px-3.5 rounded-xl shadow-[0_4px_0_rgb(136,52,56)] ring-2 ring-[#a65256] ring-opacity-40 hover:shadow-[0_2px_0_rgb(136,52,56)] hover:ring-opacity-60 hover:translate-y-[2px] active:shadow-none active:ring-0 active:translate-y-[4px] transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap"
+                    >
+                        <LightningBoltIcon className="w-4 h-4" />
+                        {t("Review")}
+                    </button>
                     <NavLink
                         to="/"
                         className={({ isActive }) =>
@@ -307,6 +319,8 @@ const LearnScreen: React.FC = () => {
                 return <MatchingMode deckId={parseInt(deckId)} />;
             case GameMode.Spelling:
                 return <SpellingMode deckId={parseInt(deckId)} />;
+            case GameMode.Study:
+                return <StudySession deckId={parseInt(deckId)} />;
             default:
                 return <p>{t("Unknown mode")}</p>;
         }
@@ -318,16 +332,17 @@ const LearnScreen: React.FC = () => {
         <div className="flex flex-col">
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <button onClick={() => navigate('/')} className="text-[#56A652] hover:brightness-90 mb-2 flex items-center">
+                    <button data-nav-target="/" onClick={() => navigate('/')} className="text-[#56A652] hover:brightness-90 mb-2 flex items-center">
                         <i className="fas fa-arrow-left mr-2"></i> {t("Back to Dashboard")}
                     </button>
                     <h1 className="text-3xl md:text-4xl font-bold text-[#1A2B22] dark:text-white capitalize">{t(modeLabel)} {t("Mode")}</h1>
                     <p className="text-[#AFBD96]">{t("Deck:")} <span className="font-semibold text-[#1A2B22]/90 dark:text-[#F1F5F9]/90">{deck.name}</span></p>
                 </div>
                 <div className="flex space-x-2">
+                    <ModeNavButton currentMode={mode} targetMode={GameMode.Study} deckId={deckId} icon={<SparklesIcon />} />
                     <ModeNavButton currentMode={mode} targetMode={GameMode.Flashcard} deckId={deckId} icon={<BookOpenIcon />} />
-                    <ModeNavButton currentMode={mode} targetMode={GameMode.Quiz} deckId={deckId} icon={<QuestionMarkCircleIcon />} />
                     <ModeNavButton currentMode={mode} targetMode={GameMode.Matching} deckId={deckId} icon={<PuzzlePieceIcon />} />
+                    <ModeNavButton currentMode={mode} targetMode={GameMode.Quiz} deckId={deckId} icon={<QuestionMarkCircleIcon />} />
                     <ModeNavButton currentMode={mode} targetMode={GameMode.Spelling} deckId={deckId} icon={<PencilIcon />} />
                 </div>
             </div>
@@ -352,6 +367,7 @@ const ModeNavButton: React.FC<ModeNavButtonProps> = ({ currentMode, targetMode, 
 
     return (
         <button
+            data-nav-target={`/learn/${deckId}/${targetMode}`}
             onClick={() => navigate(`/learn/${deckId}/${targetMode}`)}
             className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
             title={`${targetMode.charAt(0).toUpperCase() + targetMode.slice(1)} Mode`}

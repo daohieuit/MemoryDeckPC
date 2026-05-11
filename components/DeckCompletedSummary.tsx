@@ -29,14 +29,15 @@ export const DeckCompletedSummary: React.FC = () => {
 
     const renderFlashcardResults = (data: ModeResults['flashcard']) => {
         if (!data) return null;
-        const totalReviewed = data.easy + data.good + data.hard;
+        const totalReviewed = data.again + data.hard + data.good + data.easy;
         return (
             <div className="bg-white dark:bg-[#446843] p-4 rounded-lg shadow-md mb-4">
                 <h3 className="text-xl font-bold text-[#1A2B22] dark:text-white mb-2">{t("Flashcard Mode")}</h3>
                 <p>{t("Total Cards Reviewed:")} {totalReviewed} / {data.totalCards}</p>
-                <p>{t("Easy:")} {data.easy}</p>
-                <p>{t("Good:")} {data.good}</p>
+                <p>{t("Again:")} {data.again}</p>
                 <p>{t("Hard:")} {data.hard}</p>
+                <p>{t("Good:")} {data.good}</p>
+                <p>{t("Easy:")} {data.easy}</p>
             </div>
         );
     };
