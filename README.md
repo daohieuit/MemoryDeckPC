@@ -84,3 +84,6 @@ Expand your knowledge of MemoryDeck by exploring our specialized guides:
 - **Premium Aesthetics**: Modern interface with glassmorphism, smooth animations, and automatic Dark Mode persistence.
 - **Robust Persistence**: All data is stored locally in a **SQLite** database (`memorydeck.db`), ensuring your progress is safe and fast.
 - **Bulk Import**: Quickly add cards using tab-separated text data.
+
+---
+Designed by **DaoHieuIT** (and maybe a little bit of AI) in 2026.
